@@ -1240,7 +1240,16 @@
 
         // Authentication & Lifecycle
         let _currentZoom = 1;
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const configRes = await apiGet({ action: "config" });
+                if (configRes && configRes.ok && configRes.data) {
+                    for (const key in configRes.data) {
+                        localStorage.setItem(key, configRes.data[key]);
+                    }
+                    if (window.applyCustomStyles) window.applyCustomStyles();
+                }
+            } catch(e) {}
             initAuthUI();
             loadCurrentSettings();
         });
@@ -1638,7 +1647,7 @@
 
         function saveSettings() {
             const settings = getFormValues();
-            localStorage.setItem('icms_settings', JSON.stringify(settings));
+            const val = JSON.stringify(settings); localStorage.setItem('icms_settings', val); apiPost("saveConfig", { configKey: "icms_settings", configValue: val }).catch(console.error);
 
             // Apply immediately to current page
             if (window.applyCustomStyles) {
@@ -1724,6 +1733,8 @@
 </body>
 
 </html>
+
+
 
 
 

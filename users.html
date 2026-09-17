@@ -511,7 +511,16 @@
 
         let allUsers = [];
 
-        document.addEventListener("DOMContentLoaded", () => { initAuthUI(); loadUsers(); });
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const configRes = await apiGet({ action: "config" });
+                if (configRes && configRes.ok && configRes.data) {
+                    for (const key in configRes.data) {
+                        localStorage.setItem(key, configRes.data[key]);
+                    }
+                    if (window.applyCustomStyles) window.applyCustomStyles();
+                }
+            } catch(e) {} initAuthUI(); loadUsers(); });
 
         function getSession() {
             const raw = sessionStorage.getItem("icms_session");
@@ -666,5 +675,6 @@
 </body>
 
 </html>
+
 
 

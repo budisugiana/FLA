@@ -114,6 +114,7 @@ function doGet(e){
     if(action==="setup") return json_({ok:true,msg:setupSheet_(sheetName)});
     if(action==="setupAll") return json_({ok:true,msg:setupAllSheets()});
     if(action==="tables") return json_({ok:true,data:Object.keys(SCHEMAS)});
+    if(action==="config") return json_({ok:true,data:getAllConfigs_()});
     return json_({ok:false,msg:"Action GET tidak dikenal."});
   }catch(err){return json_({ok:false,msg:String(err.message||err)})}
 }
@@ -128,6 +129,7 @@ function doPost(e){
     if(action==="logout"){ destroySession_(p.token); return json_({ok:true,msg:"Logout berhasil."}); }
     const session=requireSession_(p.token);
     if(sheetName==="users" && session.role!=="admin") throw new Error("Hanya admin yang dapat mengelola user.");
+    if(action==="saveConfig") return json_({ok:true,msg:saveConfig_(p.configKey, p.configValue)});
     if(action==="save") return json_(save_(sheetName,p));
     if(action==="delete") return json_(delete_(sheetName,p.id));
     if(action==="deleteAll") return json_(deleteAll_(sheetName));
@@ -548,3 +550,43 @@ function json_(obj){
 
 
 
+
+// ============================================================
+// GLOBAL CONFIGURATION
+// ============================================================
+function configSheet_(){
+  const ss=SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  let sh=ss.getSheetByName("_config");
+  if(!sh){
+    sh=ss.insertSheet("_config");
+    sh.getRange(1,1,1,2).setValues([["key","value"]]);
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+
+function saveConfig_(key, valueStr){
+  if(!key) throw new Error("Key config kosong.");
+  const sh=configSheet_();
+  const rows=sh.getDataRange().getValues();
+  for(let i=1;i<rows.length;i++){
+    if(String(rows[i][0])===String(key)){
+      sh.getRange(i+1,2).setValue(valueStr);
+      SpreadsheetApp.flush();
+      return "Config disimpan (update).";
+    }
+  }
+  sh.appendRow([key, valueStr]);
+  SpreadsheetApp.flush();
+  return "Config disimpan (baru).";
+}
+
+function getAllConfigs_(){
+  const sh=configSheet_();
+  const rows=sh.getDataRange().getValues();
+  let result = {};
+  for(let i=1;i<rows.length;i++){
+    result[rows[i][0]] = rows[i][1];
+  }
+  return result;
+}

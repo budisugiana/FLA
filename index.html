@@ -2050,7 +2050,7 @@
             try { const raw = localStorage.getItem(CHARTS_KEY); return raw ? JSON.parse(raw) : []; }
             catch (e) { return []; }
         }
-        function saveCharts() { localStorage.setItem(CHARTS_KEY, JSON.stringify(charts)); }
+        function saveCharts() { const val = JSON.stringify(charts); localStorage.setItem(CHARTS_KEY, val); apiPost("saveConfig", { configKey: CHARTS_KEY, configValue: val }).catch(console.error); }
 
         function renderCharts() {
             const container = document.getElementById("chartsContainer");
@@ -3043,7 +3043,16 @@
             });
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const configRes = await apiGet({ action: "config" });
+                if (configRes && configRes.ok && configRes.data) {
+                    for (const key in configRes.data) {
+                        localStorage.setItem(key, configRes.data[key]);
+                    }
+                    if (window.applyCustomStyles) window.applyCustomStyles();
+                }
+            } catch(e) {}
             initAuthUI();
             buildForm();
             charts = loadCharts();
@@ -3440,7 +3449,7 @@
                 return (Array.isArray(saved) && saved.length) ? saved : defaultScorecards();
             } catch (e) { return defaultScorecards(); }
         }
-        function saveScorecards() { localStorage.setItem(SCORECARDS_KEY, JSON.stringify(scorecards)); }
+        function saveScorecards() { const val = JSON.stringify(scorecards); localStorage.setItem(SCORECARDS_KEY, val); apiPost("saveConfig", { configKey: SCORECARDS_KEY, configValue: val }).catch(console.error); }
 
         // computeScorecardValue(cfg, metric?) — metric overrides cfg.field/agg if provided
         function computeScorecardValue(cfg, metric) {
@@ -4394,6 +4403,7 @@
 </body>
 
 </html>
+
 
 
 

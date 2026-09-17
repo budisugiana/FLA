@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — ICMS</title>
+<script src="core.js"></script>
+<style>
+:root{
+  --dark:#0b3c55;--mid:#0F5A7D;--accent:#007474;--bg:#e6f4f1;
+  --bg2:#cceeee;--border:#2d7a6b;--muted:#4b6f6a;--text:#1e3a3a
+}
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding-bottom:20vh;
+  padding-left:65vw;
+  padding-right:5vw;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:var(--text);
+  background:url('login-bg.jpg') center center/cover no-repeat;
+}
+
+.card{background:#fff;border-radius:16px;padding:32px 30px;width:min(380px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.brand{display:flex;gap:11px;align-items:center;margin-bottom:22px}
+.brand-mark{width:44px;height:44px;border-radius:10px;background:var(--accent);display:grid;place-items:center;font-weight:800;color:#fff;font-size:18px}
+.brand-title{font-size:19px;font-weight:800;color:var(--dark)}
+.brand-subtitle{font-size:11px;color:var(--muted)}
+label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:14px 0 5px}
+input{width:100%;padding:10px 11px;border-radius:8px;border:1px solid var(--border);font-size:13px;background:#f7fdfc;color:var(--text)}
+button{width:100%;margin-top:20px;padding:11px;border:0;border-radius:8px;background:var(--accent);color:#fff;font-weight:700;font-size:13px;cursor:pointer}
+button:hover{opacity:.9}
+button:disabled{opacity:.6;cursor:default}
+#msg{margin-top:12px;font-size:12px;text-align:center;min-height:16px}
+.error{color:#c0392b}
+.info{color:#0F5A7D}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand">
+    <div class="brand-mark">LSV</div>
+    <div>
+      <div class="brand-title">Kartu Kontrol</div>
+      <div class="brand-subtitle">Budget Monitoring</div>
+    </div>
+  </div>
+  <form id="loginForm">
+    <label for="username">Username/Singkatan Unit</label>
+    <input id="username" type="text" autocomplete="username" required>
+    <label for="password">Password</label>
+    <input id="password" type="password" autocomplete="current-password" required>
+    <button type="submit" id="submitBtn">Masuk</button>
+    <div id="msg"></div>
+  </form>
+</div>
+
+<script>
+// ============================================================
+// KONFIGURASI API — SAMA DENGAN halaman lain
+// ============================================================
+const API_URL = "https://script.google.com/macros/s/AKfycbyJoZ2eU7rcPjoiQDERgrwAu2_wSL-AQ9wP46-7neFspaXYIVHDyD4F1p6q4XCBWVMx/exec";
+const API_KEY = "2026-BNU-KARTUKONTROL";
+// ============================================================
+
+// Jika sudah pernah login dan sesi masih berlaku, langsung lempar ke halaman utama.
+(function checkExisting(){
+  const raw = sessionStorage.getItem("icms_session");
+  if(!raw) return;
+  try{
+    const s = JSON.parse(raw);
+    if(s.token && s.expires && new Date(s.expires).getTime() > Date.now()){
+      window.location.href = "index.html";
+    }
+  }catch(e){ sessionStorage.removeItem("icms_session"); }
+})();
+
+document.getElementById("loginForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value;
+  const btn = document.getElementById("submitBtn");
+  const msg = document.getElementById("msg");
+  msg.textContent = "Memproses...";
+  msg.className = "info";
+  btn.disabled = true;
+  try{
+    const body = new URLSearchParams({key:API_KEY, action:"login", username, password});
+    const res = await fetch(API_URL, {
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},
+      body
+    });
+    const text = await res.text();
+    let json;
+    try{ json = JSON.parse(text); }catch(err){ throw new Error("Respons API bukan JSON: "+text.slice(0,200)); }
+    if(!json.ok) throw new Error(json.msg || "Login gagal.");
+
+    sessionStorage.setItem("icms_session", JSON.stringify({
+      token: json.token,
+      username: json.username,
+      role: json.role,
+      expires: json.expires
+    }));
+    msg.textContent = "Berhasil masuk, mengalihkan...";
+    msg.className = "info";
+    window.location.href = "index.html";
+  }catch(err){
+    msg.textContent = err.message;
+    msg.className = "error";
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

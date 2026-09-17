@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan Tampilan — ICMS</title>
+    <script>
+        (function () {
+            const raw = sessionStorage.getItem("icms_session");
+            let valid = false;
+            if (raw) {
+                try {
+                    const s = JSON.parse(raw);
+                    if (s.token && s.expires && new Date(s.expires).getTime() > Date.now()) valid = true;
+                } catch (e) { }
+            }
+            if (!valid) {
+                sessionStorage.removeItem("icms_session");
+                window.location.href = "login.html";
+            }
+        })();
+    </script>
+    <script src="core.js"></script>
+    <style>
+        :root {
+            --dark: #0b3c55;
+            --mid: #0F5A7D;
+            --accent: #007474;
+            --bg: #e6f4f1;
+            --bg2: #cceeee;
+            --border: #2d7a6b;
+            --muted: #4b6f6a;
+            --text: #1e3a3a
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg), var(--bg2));
+            color: var(--text)
+        }
+
+        .app-shell {
+            display: flex;
+            min-height: 100vh
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: linear-gradient(180deg, #0b3c55, #17688a);
+            color: #fff;
+            padding: 20px 16px;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, .15);
+            z-index: 50
+        }
+
+        .brand {
+            display: flex;
+            gap: 11px;
+            align-items: center;
+            margin-bottom: 18px
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #007474;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            font-size: 18px;
+            text-align: center;
+            padding: 0
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 800
+        }
+
+        .brand-subtitle {
+            font-size: 10px;
+            opacity: .75
+        }
+
+        .sidebar hr {
+            border: 0;
+            border-top: 1px solid rgba(255, 255, 255, .18);
+            margin: 15px 0
+        }
+
+        .sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 5px
+        }
+
+        .sidebar nav a {
+            color: rgba(255, 255, 255, .85);
+            text-decoration: none;
+            padding: 10px 11px;
+            border-radius: 7px;
+            font-size: 12px
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.active {
+            background: rgba(255, 255, 255, .16);
+            color: #fff
+        }
+
+        .sidebar-bottom {
+            position: absolute;
+            bottom: 18px;
+            left: 16px;
+            right: 16px
+        }
+
+        .small {
+            font-size: 9px;
+            opacity: .65;
+            margin-top: 3px
+        }
+
+        .main {
+            margin-left: 260px;
+            flex: 1;
+            padding: 24px;
+            min-width: 0
+        }
+
+        .hero {
+            background: linear-gradient(90deg, #0b3c55, #0F5A7D);
+            border-radius: 16px;
+            padding: 22px;
+            color: #fff;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .12);
+            margin-bottom: 24px
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 23px
+        }
+
+        .hero p {
+            font-size: 12px;
+            opacity: .8;
+            margin: 5px 0 0
+        }
+
+        .settings-container {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .settings-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 4px 15px rgba(0, 116, 116, .06);
+            border: 1px solid var(--border);
+            margin-bottom: 20px
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #e2ece9;
+            padding-bottom: 8px;
+        }
+
+        .btn {
+            cursor: pointer;
+            border: 0;
+            border-radius: 7px;
+            padding: 9px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            opacity: .88;
+            transform: translateY(-1px);
+        }
+
+        .primary {
+            background: var(--accent);
+            color: #fff
+        }
+
+        .gray {
+            background: #94a3b8;
+            color: #fff
+        }
+
+        .danger {
+            background: #ef4444;
+            color: #fff
+        }
+
+        .outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f7fafc;
+            border: 1px solid #cbd5e1;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+
+        .color-picker-wrapper input[type="color"] {
+            border: none;
+            width: 32px;
+            height: 24px;
+            padding: 0;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .color-picker-wrapper input[type="text"] {
+            border: none;
+            background: transparent;
+            font-size: 11px;
+            font-family: monospace;
+            width: 100%;
+            color: var(--text);
+            text-transform: uppercase;
+        }
+
+        .color-picker-wrapper input[type="text"]:focus {
+            outline: none;
+        }
+
+        select, input[type="number"], input[type="range"] {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-size: 12px;
+            background: #fcfdfe;
+            color: var(--text);
+            transition: border 0.15s ease;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .range-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .range-container input[type="range"] {
+            flex: 1;
+            padding: 0;
+        }
+
+        .range-value {
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 36px;
+            text-align: right;
+        }
+
+        /* Preset Buttons */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .preset-btn {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--accent);
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        .preset-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .preset-preview-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .preview-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* Live Preview Styles */
+        .preview-shell {
+            border: 1px solid #b2d8d0;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            min-height: 250px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            background: #e6f4f1;
+        }
+
+        .preview-sidebar {
+            width: 90px;
+            background: linear-gradient(180deg, #0b3c55, #17688a);
+            color: #fff;
+            padding: 8px;
+            font-size: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .preview-brand {
+            font-weight: 800;
+            font-size: 9px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .preview-brand-mark {
+            width: 12px;
+            height: 12px;
+            background: #007474;
+            border-radius: 3px;
+            font-size: 6px;
+            display: grid;
+            place-items: center;
+        }
+
+        .preview-nav-item {
+            padding: 4px 6px;
+            border-radius: 3px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 7px;
+            display: block;
+        }
+
+        .preview-nav-item.active {
+            background: rgba(255,255,255,0.16);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .preview-content {
+            flex: 1;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow: auto;
+        }
+
+        .preview-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .preview-text {
+            font-size: 9px;
+            color: #1e3a3a;
+            margin: 0;
+        }
+
+        .preview-table-wrap {
+            border: 1px solid #b2d8d0;
+            border-radius: 6px;
+            overflow: auto;
+            background: #fff;
+        }
+
+        .preview-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .preview-table th, .preview-table td {
+            border: 1px solid #b2d8d0;
+            padding: 4px 6px;
+            font-size: 8px;
+            text-align: center;
+        }
+
+        .preview-table th {
+            background: #0F5A7D;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .preview-table tr:nth-child(even) td {
+            background: #f0faf8;
+        }
+
+        #save-status {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+            text-align: center;
+            min-height: 18px;
+        }
+
+        .success-text {
+            color: #16a34a;
+        }
+
+        /* COLE Preview */
+        .pcole-month {
+            border: 1px solid #d1e9e4;
+            border-radius: 8px;
+            padding: 7px;
+            background: #fff;
+            font-size: 8px;
+        }
+        .pcole-month-title {
+            font-weight: 800;
+            font-size: 9px;
+            color: #0b3c55;
+            border-bottom: 1px solid #d1e9e4;
+            padding-bottom: 4px;
+            margin-bottom: 5px;
+        }
+        .pcole-day-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+        .pcole-day {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7px;
+            font-weight: 600;
+            color: #374151;
+            transition: background 0.25s;
+        }
+        .pcole-day.event {
+            color: #fff !important;
+        }
+        .pcole-day.today-dot {
+            border: 1.5px solid #0b3c55;
+        }
+        .pcole-legend-dot {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 999px;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">LSV</div>
+                <div>
+                    <div class="brand-title">Kartu Kontrol</div>
+                    <div class="brand-subtitle">Budget Monitoring</div>
+                </div>
+            </div>
+            <hr>
+            <nav>
+                <a href="index.html">▦ SUMMARY</a>
+                <a href="rka.html">▤ RENCANA KERJA ANGGARAN</a>
+                <a href="createkelas.html">⊞ PEMBUATAN KELAS</a>
+                <a href="konfirmasiprogram.html">☑ KONFIRMASI PROGRAM (UIC)</a>
+                <a href="pengeluaran.html">⛃ KONFIRMASI PEMBUKUAN (OSB)</a>
+                <a href="keu_smarter.html" style="padding-left:32px">↳ SMARTER</a>
+                <a href="keu_portal.html" style="padding-left:32px">↳ PORTAL</a>
+                <a href="keu_other.html" style="padding-left:32px">↳ OTHER</a>
+                <a id="navUsers" href="users.html" style="display:none">⚿ KELOLA USER</a>
+                <a id="navCole" href="cole.html">📅 COLE</a>
+                <a class="active" id="navSettings" href="settings.html">⚙ PENGATURAN</a>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="small" id="whoami" style="margin-bottom:8px">Memuat...</div>
+                
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.15);">
+                    <span style="font-size:11px;font-weight:600;opacity:0.8">◚ Ukuran Font</span>
+                    <div style="display:flex;gap:4px">
+                        <button onclick="changeFontSize(-1)" class="edit-toggle-btn active"
+                            style="padding:2px 6px;font-size:11px;border-radius:4px" title="Perkecil Text">A-</button>
+                        <button onclick="changeFontSize(1)" class="edit-toggle-btn active"
+                            style="padding:2px 6px;font-size:11px;border-radius:4px" title="Perbesar Text">A+</button>
+                    </div>
+                </div>
+
+                <button class="btn gray" style="width:100%" onclick="logout()">🚪 Logout</button>
+                <div style="text-align:center;font-size:10px;color:rgba(255,255,255,0.5);margin-top:14px;font-style:italic;letter-spacing:0.3px">
+                    AI-Powered. Experience-Driven</div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <section class="hero">
+                <h1>⚙ Pengaturan Tampilan</h1>
+                <p>Ubah warna background, sidebar, font, ukuran minimal/maksimal kolom dan baris tabel di seluruh sistem ICMS.</p>
+            </section>
+
+            <div class="settings-container">
+                <!-- Controls Card -->
+                <div>
+                    <div class="card">
+                        <div class="card-title">🎨 Preset Tema Instan</div>
+                        <div class="preset-grid">
+                            <button class="preset-btn" onclick="applyPreset('default')">
+                                <span class="preset-name">Default Teal</span>
+                                <div class="preset-preview-dots">
+                                    <div class="preview-dot" style="background:#e6f4f1"></div>
+                                    <div class="preview-dot" style="background:#0b3c55"></div>
+                                    <div class="preview-dot" style="background:#007474"></div>
+                                </div>
+                            </button>
+                            <button class="preset-btn" onclick="applyPreset('dark')">
+                                <span class="preset-name">Dark Elegance</span>
+                                <div class="preset-preview-dots">
+                                    <div class="preview-dot" style="background:#1e1e2f"></div>
+                                    <div class="preview-dot" style="background:#0f0f1a"></div>
+                                    <div class="preview-dot" style="background:#6366f1"></div>
+                                </div>
+                            </button>
+                            <button class="preset-btn" onclick="applyPreset('forest')">
+                                <span class="preset-name">Forest Nature</span>
+                                <div class="preset-preview-dots">
+                                    <div class="preview-dot" style="background:#f4f8f5"></div>
+                                    <div class="preview-dot" style="background:#1b4332"></div>
+                                    <div class="preview-dot" style="background:#52b788"></div>
+                                </div>
+                            </button>
+                            <button class="preset-btn" onclick="applyPreset('sunset')">
+                                <span class="preset-name">Sunset Glow</span>
+                                <div class="preset-preview-dots">
+                                    <div class="preview-dot" style="background:#fff5f5"></div>
+                                    <div class="preview-dot" style="background:#3e0a24"></div>
+                                    <div class="preview-dot" style="background:#d946ef"></div>
+                                </div>
+                            </button>
+                            <button class="preset-btn" onclick="applyPreset('professional')">
+                                <span class="preset-name">Clean Pro</span>
+                                <div class="preset-preview-dots">
+                                    <div class="preview-dot" style="background:#f8fafc"></div>
+                                    <div class="preview-dot" style="background:#0f172a"></div>
+                                    <div class="preview-dot" style="background:#2563eb"></div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🎨 Kustomisasi Background & Aksen</div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Background (Warna Atas/Kiri)</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="bgColor" oninput="syncColorText('bgColor', 'bgColorText')">
+                                    <input type="text" id="bgColorText" onchange="syncColorPicker('bgColorText', 'bgColor')">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Background (Warna Bawah/Kanan)</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="bgColor2" oninput="syncColorText('bgColor2', 'bgColor2Text')">
+                                    <input type="text" id="bgColor2Text" onchange="syncColorPicker('bgColor2Text', 'bgColor2')">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Warna Aksen Utama (Tombol, Brand)</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" id="accentColor" oninput="syncColorText('accentColor', 'accentColorText')">
+                                <input type="text" id="accentColorText" onchange="syncColorPicker('accentColorText', 'accentColor')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🎨 Kustomisasi Sidebar</div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Sidebar (Warna Atas)</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="sidebarColor" oninput="syncColorText('sidebarColor', 'sidebarColorText')">
+                                    <input type="text" id="sidebarColorText" onchange="syncColorPicker('sidebarColorText', 'sidebarColor')">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Sidebar (Warna Bawah)</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="sidebarColor2" oninput="syncColorText('sidebarColor2', 'sidebarColor2Text')">
+                                    <input type="text" id="sidebarColor2Text" onchange="syncColorPicker('sidebarColor2Text', 'sidebarColor2')">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Warna Menu Sidebar Aktif</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" id="sidebarActiveColor" oninput="syncColorText('sidebarActiveColor', 'sidebarActiveColorText')">
+                                <input type="text" id="sidebarActiveColorText" onchange="syncColorPicker('sidebarActiveColorText', 'sidebarActiveColor')">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Lebar Sidebar</label>
+                            <div class="range-container">
+                                <input type="range" id="sidebarWidth" min="180" max="320" step="5" oninput="updateRangeVal('sidebarWidth', 'sidebarWidthVal')">
+                                <span class="range-value" id="sidebarWidthVal">240px</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🎨 Kustomisasi Panel Atas (Hero & Filter)</div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Panel Atas (Warna Kiri)</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="heroBgColor" oninput="syncColorText('heroBgColor', 'heroBgColorText')">
+                                    <input type="text" id="heroBgColorText" onchange="syncColorPicker('heroBgColorText', 'heroBgColor')">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Panel Atas (Warna Kanan)</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="heroBgColor2" oninput="syncColorText('heroBgColor2', 'heroBgColor2Text')">
+                                    <input type="text" id="heroBgColor2Text" onchange="syncColorPicker('heroBgColor2Text', 'heroBgColor2')">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔤 Tipografi (Font)</div>
+                        
+                        <div class="form-group">
+                            <label for="fontFamily">Jenis Font General</label>
+                            <select id="fontFamily" onchange="updatePreview()">
+                                <option value="system-ui">System UI (Bawaan)</option>
+                                <option value="Inter">Inter (Sleek & Modern)</option>
+                                <option value="Roboto">Roboto (Clean & Readable)</option>
+                                <option value="Poppins">Poppins (Geometric Sans-serif)</option>
+                                <option value="Outfit">Outfit (Premium & Elegant)</option>
+                                <option value="Montserrat">Montserrat (Modern & Bold)</option>
+                                <option value="Playfair Display">Playfair Display (Elegant Serif)</option>
+                                <option value="Cinzel">Cinzel (Classical Roman Serif)</option>
+                                <option value="Lato">Lato (Friendly Sans)</option>
+                                <option value="Ubuntu">Ubuntu (Techy Sans)</option>
+                                <option value="Open Sans">Open Sans (Neutral & Clean)</option>
+                                <option value="Nunito">Nunito (Warm Rounded)</option>
+                                <option value="Quicksand">Quicksand (Friendly Rounded)</option>
+                                <option value="Lora">Lora (Contemporary Serif)</option>
+                                <option value="Cabin">Cabin (Humanist Sans)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ukuran Font Sidebar</label>
+                            <div class="range-container">
+                                <input type="range" id="sidebarFontSize" min="9" max="18" step="0.5" oninput="updateRangeVal('sidebarFontSize', 'sidebarFontSizeVal')">
+                                <span class="range-value" id="sidebarFontSizeVal">12px</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ukuran Font Judul / Header</label>
+                            <div class="range-container">
+                                <input type="range" id="titleFontSize" min="16" max="32" step="1" oninput="updateRangeVal('titleFontSize', 'titleFontSizeVal')">
+                                <span class="range-value" id="titleFontSizeVal">23px</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ukuran Font Tabel</label>
+                            <div class="range-container">
+                                <input type="range" id="tableFontSize" min="9" max="18" step="0.5" oninput="updateRangeVal('tableFontSize', 'tableFontSizeVal')">
+                                <span class="range-value" id="tableFontSizeVal">11.5px</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📊 Kustomisasi Tabel (Tata Letak & Warna)</div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tableMinColWidth">Lebar Kolom Minimal (px)</label>
+                                <input type="number" id="tableMinColWidth" min="40" max="300" step="5" oninput="updatePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label for="tableMaxColWidth">Lebar Kolom Maksimal (px)</label>
+                                <input type="number" id="tableMaxColWidth" min="80" max="600" step="10" oninput="updatePreview()">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tableMinRowHeight">Tinggi Baris Minimal (px)</label>
+                                <input type="number" id="tableMinRowHeight" min="20" max="100" step="2" oninput="updatePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label for="tableMaxRowHeight">Tinggi Baris Maksimal (px)</label>
+                                <input type="number" id="tableMaxRowHeight" min="30" max="120" step="2" oninput="updatePreview()">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Background Header Kolom</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="tableHeaderBgColor" oninput="syncColorText('tableHeaderBgColor', 'tableHeaderBgColorText')">
+                                    <input type="text" id="tableHeaderBgColorText" onchange="syncColorPicker('tableHeaderBgColorText', 'tableHeaderBgColor')">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Teks Header Kolom</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="tableHeaderTextColor" oninput="syncColorText('tableHeaderTextColor', 'tableHeaderTextColorText')">
+                                    <input type="text" id="tableHeaderTextColorText" onchange="syncColorPicker('tableHeaderTextColorText', 'tableHeaderTextColor')">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📐 Kelengkungan Sudut (Shape Corners)</div>
+                        
+                        <div class="form-group">
+                            <label>Kelengkungan Kartu & Panel</label>
+                            <div class="range-container">
+                                <input type="range" id="cardBorderRadius" min="0" max="32" step="1" oninput="updateRangeVal('cardBorderRadius', 'cardBorderRadiusVal')">
+                                <span class="range-value" id="cardBorderRadiusVal">16px</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Kelengkungan Tombol & Input</label>
+                            <div class="range-container">
+                                <input type="range" id="buttonBorderRadius" min="0" max="20" step="1" oninput="updateRangeVal('buttonBorderRadius', 'buttonBorderRadiusVal')">
+                                <span class="range-value" id="buttonBorderRadiusVal">8px</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📅 Kustomisasi Kalender COLE</div>
+                        
+                        <div class="form-group">
+                            <label for="coleMonthsPerRow">Bulan per Baris (Layout Grid)</label>
+                            <select id="coleMonthsPerRow" onchange="updatePreview()">
+                                <option value="auto">Auto-Fit (Lebar Otomatis)</option>
+                                <option value="1">1 Bulan per Baris</option>
+                                <option value="2">2 Bulan per Baris</option>
+                                <option value="3">3 Bulan per Baris</option>
+                                <option value="4">4 Bulan per Baris</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label style="font-weight:700; margin-bottom:8px; display:block">Warna Kategori Jadwal COLE</label>
+                            
+                            <div class="form-row" style="margin-bottom:8px">
+                                <div class="form-group">
+                                    <label>Pertemuan</label>
+                                    <div class="color-picker-wrapper">
+                                        <input type="color" id="coleColorOrange" oninput="syncColorText('coleColorOrange', 'coleColorOrangeText')">
+                                        <input type="text" id="coleColorOrangeText" onchange="syncColorPicker('coleColorOrangeText', 'coleColorOrange')">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Laporan / Persuratan</label>
+                                    <div class="color-picker-wrapper">
+                                        <input type="color" id="coleColorGreen" oninput="syncColorText('coleColorGreen', 'coleColorGreenText')">
+                                        <input type="text" id="coleColorGreenText" onchange="syncColorPicker('coleColorGreenText', 'coleColorGreen')">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row" style="margin-bottom:8px">
+                                <div class="form-group">
+                                    <label>Pelatihan</label>
+                                    <div class="color-picker-wrapper">
+                                        <input type="color" id="coleColorBlue" oninput="syncColorText('coleColorBlue', 'coleColorBlueText')">
+                                        <input type="text" id="coleColorBlueText" onchange="syncColorPicker('coleColorBlueText', 'coleColorBlue')">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tanggal Merah</label>
+                                    <div class="color-picker-wrapper">
+                                        <input type="color" id="coleColorRed" oninput="syncColorText('coleColorRed', 'coleColorRedText')">
+                                        <input type="text" id="coleColorRedText" onchange="syncColorPicker('coleColorRedText', 'coleColorRed')">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Internal IDA</label>
+                                    <div class="color-picker-wrapper">
+                                        <input type="color" id="coleColorPurple" oninput="syncColorText('coleColorPurple', 'coleColorPurpleText')">
+                                        <input type="text" id="coleColorPurpleText" onchange="syncColorPicker('coleColorPurpleText', 'coleColorPurple')">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Internal BNU</label>
+                                    <div class="color-picker-wrapper">
+                                        <input type="color" id="coleColorGray" oninput="syncColorText('coleColorGray', 'coleColorGrayText')">
+                                        <input type="text" id="coleColorGrayText" onchange="syncColorPicker('coleColorGrayText', 'coleColorGray')">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:12px;margin-bottom:40px;flex-wrap:wrap">
+                        <button class="btn primary" onclick="saveSettings()">💾 Simpan Setelan</button>
+                        <button class="btn danger outline" onclick="resetToDefault()">🔄 Reset Warna & Font</button>
+                        <button class="btn danger" style="background:#ef4444 !important;color:#fff" onclick="resetAllSettings()">💥 Reset Total (Semua Halaman & Tabel)</button>
+                    </div>
+                    <div id="save-status"></div>
+                </div>
+
+                <!-- Preview Card -->
+                <div style="position: sticky; top: 24px;">
+                    <div class="card">
+                        <div class="card-title">👁 Pratinjau Tampilan (Live Preview)</div>
+                        <p style="font-size:11px;color:var(--muted);margin-bottom:12px">Pratinjau ini berubah langsung sesuai dengan setelan warna dan ukuran di sebelah kiri.</p>
+                        
+                        <div class="preview-shell" id="pShell">
+                            <!-- Sidebar Preview -->
+                            <div class="preview-sidebar" id="pSidebar">
+                                <div class="preview-brand">
+                                    <div class="preview-brand-mark" id="pBrandMark">LSV</div>
+                                    <span>Kartu Kontrol</span>
+                                </div>
+                                <hr style="border:0;border-top:1px solid rgba(255,255,255,0.18);margin:6px 0;width:100%">
+                                <a href="#" class="preview-nav-item active" id="pNavActive">▦ SUMMARY</a>
+                                <a href="#" class="preview-nav-item">▤ RENCANA</a>
+                                <a href="#" class="preview-nav-item">⊞ KELAS</a>
+                            </div>
+
+                            <!-- Main Content Preview -->
+                            <div class="preview-content" style="padding: 10px;">
+                                <!-- Preview Hero Block -->
+                                <div id="pHeroBlock" style="border-radius: 8px; padding: 10px; color: #fff; background: linear-gradient(90deg, #0b3c55, #0F5A7D); margin-bottom: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.06);">
+                                    <h2 class="preview-title" id="pTitle" style="margin: 0; font-size: 11px;">SUMMARY</h2>
+                                    <p class="preview-text" id="pText" style="font-size: 8px; color: rgba(255,255,255,0.85); margin: 3px 0 6px;">Ini pratinjau teks deskripsi panel atas.</p>
+                                    <div style="display:flex; gap:3px; font-size:6px; flex-wrap:wrap;">
+                                        <span style="background: rgba(255,255,255,0.2); padding: 1px 3px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.3);">🔍 Filter UNIT</span>
+                                        <span style="background: rgba(255,255,255,0.2); padding: 1px 3px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.3);">📥 Import</span>
+                                        <span style="background: rgba(255,255,255,0.2); padding: 1px 3px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.3);">📤 Export</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="preview-table-wrap">
+                                    <table class="preview-table" id="pTable">
+                                        <thead>
+                                            <tr>
+                                                <th id="pTableTh">No</th>
+                                                <th>Nama Program</th>
+                                                <th>Anggaran</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>Smarter BNU</td>
+                                                <td>Rp 50jt</td>
+                                            </tr>
+                                            <tr>
+                                                <td>2</td>
+                                                <td>Portal ICMS</td>
+                                                <td>Rp 120jt</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div style="display:flex;gap:4px;margin-top:8px">
+                                    <button class="btn primary" id="pBtnPrimary" style="padding:4px 8px;font-size:8px;border-radius:4px" onclick="event.preventDefault()">Tombol</button>
+                                    <button class="btn gray" style="padding:4px 8px;font-size:8px;border-radius:4px;background:#94a3b8" onclick="event.preventDefault()">Batal</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLE Preview Card -->
+                    <div class="card" style="margin-top:16px">
+                        <div class="card-title">📅 Pratinjau Kalender COLE</div>
+                        <p style="font-size:11px;color:var(--muted);margin-bottom:12px">Pratinjau berubah langsung sesuai warna kategori dan layout bulan yang dipilih.</p>
+
+                        <!-- Legend warna -->
+                        <div id="pColeLegend" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;"></div>
+
+                        <!-- Mini calendar grid -->
+                        <div id="pColeGrid" style="display:grid; gap:6px; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); transition: all 0.3s;">
+                            <!-- 4 bulan preview -->
+                            <div class="pcole-month" id="pColeM1"></div>
+                            <div class="pcole-month" id="pColeM2"></div>
+                            <div class="pcole-month" id="pColeM3"></div>
+                            <div class="pcole-month" id="pColeM4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbyJoZ2eU7rcPjoiQDERgrwAu2_wSL-AQ9wP46-7neFspaXYIVHDyD4F1p6q4XCBWVMx/exec";
+        const API_KEY = "2026-BNU-KARTUKONTROL";
+        const SHEET_NAME = "users";
+
+        // Default settings
+        const DEFAULT_SETTINGS = {
+            bgColor: '#e6f4f1',
+            bgColor2: '#cceeee',
+            sidebarColor: '#0b3c55',
+            sidebarColor2: '#17688a',
+            heroBgColor: '#0b3c55',
+            heroBgColor2: '#0F5A7D',
+            tableHeaderBgColor: '#0F5A7D',
+            tableHeaderTextColor: '#ffffff',
+            accentColor: '#007474',
+            sidebarActiveColor: 'rgba(255, 255, 255, 0.16)',
+            fontFamily: 'system-ui',
+            sidebarFontSize: '12',
+            titleFontSize: '23',
+            tableFontSize: '11.5',
+            tableMinColWidth: '80',
+            tableMaxColWidth: '300',
+            tableMinRowHeight: '32',
+            tableMaxRowHeight: '80',
+            cardBorderRadius: '16',
+            buttonBorderRadius: '8',
+            sidebarWidth: '240',
+            coleMonthsPerRow: 'auto',
+            coleColorOrange: '#f97316',
+            coleColorGreen: '#16a34a',
+            coleColorBlue: '#2563eb',
+            coleColorRed: '#dc2626',
+            coleColorPurple: '#9333ea',
+            coleColorGray: '#6b7280'
+        };
+
+        // Theme presets
+        const PRESETS = {
+            default: DEFAULT_SETTINGS,
+            dark: {
+                bgColor: '#1e1e2f',
+                bgColor2: '#252538',
+                sidebarColor: '#0f0f1a',
+                sidebarColor2: '#1a1a2e',
+                heroBgColor: '#111827',
+                heroBgColor2: '#1f2937',
+                tableHeaderBgColor: '#1f2937',
+                tableHeaderTextColor: '#ffffff',
+                accentColor: '#6366f1',
+                sidebarActiveColor: '#6366f1',
+                fontFamily: 'Poppins',
+                sidebarFontSize: '12',
+                titleFontSize: '23',
+                tableFontSize: '11.5',
+                tableMinColWidth: '80',
+                tableMaxColWidth: '300',
+                tableMinRowHeight: '32',
+                tableMaxRowHeight: '80',
+                cardBorderRadius: '16',
+                buttonBorderRadius: '8',
+                sidebarWidth: '240'
+            },
+            forest: {
+                bgColor: '#f4f8f5',
+                bgColor2: '#e2ede5',
+                sidebarColor: '#1b4332',
+                sidebarColor2: '#2d6a4f',
+                heroBgColor: '#1b4332',
+                heroBgColor2: '#2d6a4f',
+                tableHeaderBgColor: '#1b4332',
+                tableHeaderTextColor: '#ffffff',
+                accentColor: '#52b788',
+                sidebarActiveColor: 'rgba(255, 255, 255, 0.15)',
+                fontFamily: 'Inter',
+                sidebarFontSize: '12',
+                titleFontSize: '23',
+                tableFontSize: '11.5',
+                tableMinColWidth: '80',
+                tableMaxColWidth: '300',
+                tableMinRowHeight: '32',
+                tableMaxRowHeight: '80',
+                cardBorderRadius: '16',
+                buttonBorderRadius: '8',
+                sidebarWidth: '240'
+            },
+            sunset: {
+                bgColor: '#fff5f5',
+                bgColor2: '#ffe3e3',
+                sidebarColor: '#3e0a24',
+                sidebarColor2: '#630c3c',
+                heroBgColor: '#50072f',
+                heroBgColor2: '#701a4f',
+                tableHeaderBgColor: '#50072f',
+                tableHeaderTextColor: '#ffffff',
+                accentColor: '#d946ef',
+                sidebarActiveColor: '#d946ef',
+                fontFamily: 'Outfit',
+                sidebarFontSize: '12',
+                titleFontSize: '23',
+                tableFontSize: '11.5',
+                tableMinColWidth: '80',
+                tableMaxColWidth: '300',
+                tableMinRowHeight: '32',
+                tableMaxRowHeight: '80',
+                cardBorderRadius: '16',
+                buttonBorderRadius: '8',
+                sidebarWidth: '240'
+            },
+            professional: {
+                bgColor: '#f8fafc',
+                bgColor2: '#f1f5f9',
+                sidebarColor: '#0f172a',
+                sidebarColor2: '#1e293b',
+                heroBgColor: '#1e293b',
+                heroBgColor2: '#334155',
+                tableHeaderBgColor: '#1e293b',
+                tableHeaderTextColor: '#ffffff',
+                accentColor: '#2563eb',
+                sidebarActiveColor: '#2563eb',
+                fontFamily: 'Roboto',
+                sidebarFontSize: '12',
+                titleFontSize: '23',
+                tableFontSize: '11.5',
+                tableMinColWidth: '80',
+                tableMaxColWidth: '300',
+                tableMinRowHeight: '32',
+                tableMaxRowHeight: '80',
+                cardBorderRadius: '16',
+                buttonBorderRadius: '8',
+                sidebarWidth: '240'
+            },
+            ocean: {
+                bgColor: '#f0f7ff',
+                bgColor2: '#e0f2fe',
+                sidebarColor: '#0c4a6e',
+                sidebarColor2: '#0284c7',
+                heroBgColor: '#0c4a6e',
+                heroBgColor2: '#0284c7',
+                tableHeaderBgColor: '#0284c7',
+                tableHeaderTextColor: '#ffffff',
+                accentColor: '#0284c7',
+                sidebarActiveColor: 'rgba(255, 255, 255, 0.15)',
+                fontFamily: 'Outfit',
+                sidebarFontSize: '12',
+                titleFontSize: '23',
+                tableFontSize: '11.5',
+                tableMinColWidth: '80',
+                tableMaxColWidth: '300',
+                tableMinRowHeight: '32',
+                tableMaxRowHeight: '80',
+                cardBorderRadius: '16',
+                buttonBorderRadius: '8',
+                sidebarWidth: '240'
+            },
+            sakura: {
+                bgColor: '#fff5f7',
+                bgColor2: '#fce7f3',
+                sidebarColor: '#831843',
+                sidebarColor2: '#db2777',
+                heroBgColor: '#831843',
+                heroBgColor2: '#db2777',
+                tableHeaderBgColor: '#db2777',
+                tableHeaderTextColor: '#ffffff',
+                accentColor: '#db2777',
+                sidebarActiveColor: 'rgba(255, 255, 255, 0.15)',
+                fontFamily: 'Poppins',
+                sidebarFontSize: '12',
+                titleFontSize: '23',
+                tableFontSize: '11.5',
+                tableMinColWidth: '80',
+                tableMaxColWidth: '300',
+                tableMinRowHeight: '32',
+                tableMaxRowHeight: '80',
+                cardBorderRadius: '16',
+                buttonBorderRadius: '8',
+                sidebarWidth: '240'
+            },
+            aurora: {
+                bgColor: '#0f172a',
+                bgColor2: '#1e293b',
+                sidebarColor: '#022c22',
+                sidebarColor2: '#065f46',
+                heroBgColor: '#022c22',
+                heroBgColor2: '#065f46',
+                tableHeaderBgColor: '#065f46',
+                tableHeaderTextColor: '#ffffff',
+                accentColor: '#10b981',
+                sidebarActiveColor: '#10b981',
+                fontFamily: 'Inter',
+                sidebarFontSize: '12',
+                titleFontSize: '23',
+                tableFontSize: '11.5',
+                tableMinColWidth: '80',
+                tableMaxColWidth: '300',
+                tableMinRowHeight: '32',
+                tableMaxRowHeight: '80',
+                cardBorderRadius: '12',
+                buttonBorderRadius: '6',
+                sidebarWidth: '230'
+            },
+            amber: {
+                bgColor: '#fdfbf7',
+                bgColor2: '#f5efe6',
+                sidebarColor: '#451a03',
+                sidebarColor2: '#78350f',
+                heroBgColor: '#451a03',
+                heroBgColor2: '#78350f',
+                tableHeaderBgColor: '#78350f',
+                tableHeaderTextColor: '#ffffff',
+                accentColor: '#d97706',
+                sidebarActiveColor: 'rgba(255, 255, 255, 0.15)',
+                fontFamily: 'Montserrat',
+                sidebarFontSize: '12',
+                titleFontSize: '23',
+                tableFontSize: '11.5',
+                tableMinColWidth: '80',
+                tableMaxColWidth: '300',
+                tableMinRowHeight: '32',
+                tableMaxRowHeight: '80',
+                cardBorderRadius: '18',
+                buttonBorderRadius: '9',
+                sidebarWidth: '250'
+            },
+            purple: {
+                bgColor: '#faf5ff',
+                bgColor2: '#f3e8ff',
+                sidebarColor: '#4c1d95',
+                sidebarColor2: '#7c3aed',
+                heroBgColor: '#4c1d95',
+                heroBgColor2: '#7c3aed',
+                tableHeaderBgColor: '#7c3aed',
+                tableHeaderTextColor: '#ffffff',
+                accentColor: '#8b5cf6',
+                sidebarActiveColor: 'rgba(255, 255, 255, 0.15)',
+                fontFamily: 'Outfit',
+                sidebarFontSize: '12',
+                titleFontSize: '23',
+                tableFontSize: '11.5',
+                tableMinColWidth: '80',
+                tableMaxColWidth: '300',
+                tableMinRowHeight: '32',
+                tableMaxRowHeight: '80',
+                cardBorderRadius: '16',
+                buttonBorderRadius: '8',
+                sidebarWidth: '240'
+            }
+        };
+
+        // Authentication & Lifecycle
+        let _currentZoom = 1;
+        document.addEventListener("DOMContentLoaded", () => {
+            initAuthUI();
+            loadCurrentSettings();
+        });
+
+        function getSession() {
+            const raw = sessionStorage.getItem("icms_session");
+            if (!raw) return null;
+            try {
+                const s = JSON.parse(raw);
+                if (!s.token || !s.expires || new Date(s.expires).getTime() <= Date.now()) return null;
+                return s;
+            } catch (e) { return null; }
+        }
+
+        function currentToken() { const s = getSession(); return s ? s.token : ""; }
+
+        function initAuthUI() {
+            const s = getSession();
+            if (!s) { window.location.href = "login.html"; return; }
+            document.getElementById("whoami").textContent = s.username + " (" + s.role + ")";
+            if (s.role === "admin") {
+                const el = document.getElementById("navUsers");
+                if (el) el.style.display = "";
+            }
+        }
+
+        async function logout() {
+            try {
+                const body = new URLSearchParams({ key: API_KEY, sheet: SHEET_NAME, token: currentToken(), action: "logout" });
+                await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body });
+            } catch (e) { }
+            sessionStorage.removeItem("icms_session");
+            window.location.href = "login.html";
+        }
+
+        function changeFontSize(step) {
+            _currentZoom += step * 0.05;
+            if (_currentZoom < 0.7) _currentZoom = 0.7;
+            if (_currentZoom > 1.4) _currentZoom = 1.4;
+            document.querySelector('.main').style.zoom = _currentZoom;
+        }
+
+        // Settings Handling
+        function loadCurrentSettings() {
+            const settingsRaw = localStorage.getItem('icms_settings');
+            let settings = DEFAULT_SETTINGS;
+            if (settingsRaw) {
+                try {
+                    settings = { ...DEFAULT_SETTINGS, ...JSON.parse(settingsRaw) };
+                } catch (e) {
+                    settings = DEFAULT_SETTINGS;
+                }
+            }
+            populateForm(settings);
+            updatePreview();
+        }
+
+        function populateForm(settings) {
+            Object.keys(settings).forEach(key => {
+                const inputEl = document.getElementById(key);
+                const textEl = document.getElementById(key + 'Text');
+                
+                if (inputEl) {
+                    inputEl.value = settings[key];
+                    if (inputEl.type === 'range') {
+                        updateRangeVal(key, key + 'Val');
+                    }
+                }
+                
+                if (textEl) {
+                    textEl.value = settings[key];
+                }
+            });
+        }
+
+        function syncColorText(pickerId, textId) {
+            const picker = document.getElementById(pickerId);
+            const text = document.getElementById(textId);
+            if (picker && text) {
+                text.value = picker.value.toUpperCase();
+            }
+            updatePreview();
+        }
+
+        function syncColorPicker(textId, pickerId) {
+            const picker = document.getElementById(pickerId);
+            const text = document.getElementById(textId);
+            if (picker && text) {
+                let val = text.value.trim();
+                if (!val.startsWith('#')) val = '#' + val;
+                if (/^#[0-9A-F]{6}$/i.test(val)) {
+                    picker.value = val;
+                    text.value = val.toUpperCase();
+                } else if (/^rgba?\(.*\)$/i.test(val)) {
+                    // Handled if they insert rgba/rgba codes
+                    picker.value = '#000000'; 
+                }
+            }
+            updatePreview();
+        }
+
+        function updateRangeVal(rangeId, valId) {
+            const range = document.getElementById(rangeId);
+            const valSpan = document.getElementById(valId);
+            if (range && valSpan) {
+                valSpan.textContent = range.value + 'px';
+            }
+            updatePreview();
+        }
+
+        function applyPreset(name) {
+            const preset = PRESETS[name];
+            if (preset) {
+                populateForm(preset);
+                updatePreview();
+            }
+        }
+
+        // Live Preview Logic
+        function updatePreview() {
+            const pShell = document.getElementById('pShell');
+            const pSidebar = document.getElementById('pSidebar');
+            const pBrandMark = document.getElementById('pBrandMark');
+            const pNavActive = document.getElementById('pNavActive');
+            const pTitle = document.getElementById('pTitle');
+            const pText = document.getElementById('pText');
+            const pBtnPrimary = document.getElementById('pBtnPrimary');
+            const pTable = document.getElementById('pTable');
+            const pTableTh = document.getElementById('pTableTh');
+
+            const bgColor = document.getElementById('bgColor').value;
+            const bgColor2 = document.getElementById('bgColor2').value;
+            const sidebarColor = document.getElementById('sidebarColor').value;
+            const sidebarColor2 = document.getElementById('sidebarColor2').value;
+            const heroBgColor = document.getElementById('heroBgColor').value;
+            const heroBgColor2 = document.getElementById('heroBgColor2').value;
+            const accentColor = document.getElementById('accentColor').value;
+            const tableHeaderBgColor = document.getElementById('tableHeaderBgColor').value;
+            const tableHeaderTextColor = document.getElementById('tableHeaderTextColor').value;
+            
+            // Get active color sidebar (could be text or color picker)
+            let sidebarActiveColor = document.getElementById('sidebarActiveColorText').value;
+            if (!sidebarActiveColor || sidebarActiveColor.trim() === '') {
+                sidebarActiveColor = document.getElementById('sidebarActiveColor').value;
+            }
+
+            const fontFamily = document.getElementById('fontFamily').value;
+            const sidebarFontSize = document.getElementById('sidebarFontSize').value;
+            const titleFontSize = document.getElementById('titleFontSize').value;
+            const tableFontSize = document.getElementById('tableFontSize').value;
+            const tableMinColWidth = document.getElementById('tableMinColWidth').value;
+            const tableMaxColWidth = document.getElementById('tableMaxColWidth').value;
+            const tableMinRowHeight = document.getElementById('tableMinRowHeight').value;
+            const tableMaxRowHeight = document.getElementById('tableMaxRowHeight').value;
+            const cardBorderRadius = document.getElementById('cardBorderRadius').value;
+            const buttonBorderRadius = document.getElementById('buttonBorderRadius').value;
+            const sidebarWidth = document.getElementById('sidebarWidth').value;
+
+            // Apply to preview elements
+            if (pShell) {
+                pShell.style.background = `linear-gradient(135deg, ${bgColor}, ${bgColor2})`;
+                pShell.style.color = '#1e3a3a';
+                pShell.style.borderRadius = `${cardBorderRadius / 2}px`;
+            }
+
+            if (pSidebar) {
+                pSidebar.style.background = `linear-gradient(180deg, ${sidebarColor}, ${sidebarColor2})`;
+                pSidebar.style.width = `${sidebarWidth / 2.66}px`;
+                pSidebar.querySelectorAll('.preview-brand, .preview-nav-item, span').forEach(el => {
+                    el.style.fontSize = `${sidebarFontSize / 1.5}px`; // Scaled down for preview shell
+                });
+            }
+
+            const pHeroBlock = document.getElementById('pHeroBlock');
+            if (pHeroBlock) {
+                let heroVal = heroBgColor;
+                if (heroBgColor2) {
+                    heroVal = `linear-gradient(90deg, ${heroBgColor}, ${heroBgColor2})`;
+                }
+                pHeroBlock.style.background = heroVal;
+                pHeroBlock.style.borderRadius = `${cardBorderRadius / 2}px`;
+            }
+
+            if (pBrandMark) {
+                pBrandMark.style.background = accentColor;
+                pBrandMark.style.borderRadius = `${buttonBorderRadius / 2}px`;
+            }
+
+            if (pNavActive) {
+                pNavActive.style.background = sidebarActiveColor;
+            }
+
+            if (pBtnPrimary) {
+                pBtnPrimary.style.background = accentColor;
+                pBtnPrimary.style.borderRadius = `${buttonBorderRadius / 2}px`;
+            }
+
+            if (pSidebar) {
+                pSidebar.querySelectorAll('.preview-brand, .preview-nav-item').forEach(el => {
+                    el.style.borderRadius = `${buttonBorderRadius / 2}px`;
+                });
+            }
+
+            // Preview Fonts & sizes
+            const elementsToFont = [pShell, pTitle, pText, pBtnPrimary, pTable];
+            elementsToFont.forEach(el => {
+                if (el) {
+                    el.style.fontFamily = `'${fontFamily}', system-ui, sans-serif`;
+                }
+            });
+
+            if (pTitle) pTitle.style.fontSize = `${titleFontSize / 1.5}px`;
+            if (pText) pText.style.fontSize = `${tableFontSize / 1.3}px`;
+
+            // Preview Table Sizes
+            if (pTable) {
+                const cells = pTable.querySelectorAll('th, td');
+                cells.forEach(cell => {
+                    cell.style.fontSize = `${tableFontSize / 1.3}px`;
+                    if (tableMinColWidth) cell.style.minWidth = `${tableMinColWidth / 2}px`; // Scaled down for preview shell
+                    if (tableMaxColWidth) cell.style.maxWidth = `${tableMaxColWidth / 2}px`;
+                    if (tableMinRowHeight) {
+                        cell.style.height = `${tableMinRowHeight / 1.5}px`;
+                        cell.style.padding = '2px 4px';
+                    }
+                });
+
+                const headers = pTable.querySelectorAll('th');
+                headers.forEach(th => {
+                    th.style.background = tableHeaderBgColor;
+                    th.style.backgroundColor = tableHeaderBgColor;
+                    th.style.color = tableHeaderTextColor;
+                });
+            }
+
+            updateColePreview();
+        }
+
+        // ── COLE LIVE PREVIEW ──────────────────────────────────
+        function getColeColors() {
+            return {
+                orange: document.getElementById('coleColorOrange')?.value || '#f97316',
+                green:  document.getElementById('coleColorGreen')?.value  || '#16a34a',
+                blue:   document.getElementById('coleColorBlue')?.value   || '#2563eb',
+                red:    document.getElementById('coleColorRed')?.value    || '#dc2626',
+                purple: document.getElementById('coleColorPurple')?.value || '#9333ea',
+                gray:   document.getElementById('coleColorGray')?.value   || '#6b7280',
+            };
+        }
+
+        // Sample events per month preview (hari yang diberi warna)
+        const COLE_SAMPLE = {
+            0: [ { day: 3,  color: 'orange' }, { day: 10, color: 'blue' },   { day: 22, color: 'green' } ],
+            1: [ { day: 7,  color: 'purple'}, { day: 14, color: 'red' },    { day: 21, color: 'gray'  } ],
+            2: [ { day: 2,  color: 'blue'  }, { day: 16, color: 'orange' }, { day: 28, color: 'green' } ],
+            3: [ { day: 5,  color: 'red'   }, { day: 12, color: 'purple' }, { day: 19, color: 'gray'  } ],
+        };
+
+        const MONTH_NAMES = ['Januari','Februari','Maret','April'];
+
+        function renderColeMonth(containerEl, monthIdx, colorMap) {
+            const year = new Date().getFullYear();
+            // Cole asli mulai dari Minggu (firstDay = 0=Sun), sama seperti cole.html
+            const firstDay = new Date(year, monthIdx, 1).getDay(); // 0=Sun
+            const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
+            const sampleEvts = COLE_SAMPLE[monthIdx] || [];
+            const evtMap = {};
+            sampleEvts.forEach(e => evtMap[e.day] = e.color);
+
+            const now = new Date();
+            const todayM = now.getMonth();
+            const todayD = now.getDate();
+
+            // Gunakan struktur table persis seperti cole.html
+            let html = `
+                <div class="pcole-month-title">📅 ${MONTH_NAMES[monthIdx]} ${year}</div>
+                <table style="width:100%;border-collapse:collapse;table-layout:fixed">
+                    <tr>
+                        <th style="color:#ef4444;font-weight:700;font-size:9px;padding:2px;text-align:center">Min</th>
+                        <th style="font-weight:700;font-size:9px;padding:2px;text-align:center">Sen</th>
+                        <th style="font-weight:700;font-size:9px;padding:2px;text-align:center">Sel</th>
+                        <th style="font-weight:700;font-size:9px;padding:2px;text-align:center">Rab</th>
+                        <th style="font-weight:700;font-size:9px;padding:2px;text-align:center">Kam</th>
+                        <th style="font-weight:700;font-size:9px;padding:2px;text-align:center">Jum</th>
+                        <th style="color:#3b82f6;font-weight:700;font-size:9px;padding:2px;text-align:center">Sab</th>
+                    </tr>
+                    <tr>`;
+
+            // Padding awal (firstDay 0=Min, 1=Sen, ..., 6=Sab)
+            for (let i = 0; i < firstDay; i++) {
+                html += `<td></td>`;
+            }
+
+            let col = firstDay;
+            for (let d = 1; d <= daysInMonth; d++) {
+                const hasEv = !!evtMap[d];
+                const isToday = (monthIdx === todayM && d === todayD);
+
+                if (hasEv) {
+                    const evColor = colorMap[evtMap[d]] || '#f97316';
+                    const todayCls = isToday ? ';outline:2px solid #1e3a3a;outline-offset:-2px' : '';
+                    html += `<td style="padding:1px;text-align:center">`;
+                    html += `<button style="width:100%;aspect-ratio:1;border:none;border-radius:4px;font-size:9px;font-weight:700;cursor:default;background:${evColor};color:#fff${todayCls}">${d}</button>`;
+                    html += `</td>`;
+                } else {
+                    const todayStyle = isToday ? 'font-weight:800;color:#0f172a;text-decoration:underline' : '';
+                    html += `<td style="padding:1px;text-align:center;font-size:9px;${todayStyle}">${d}</td>`;
+                }
+
+                col++;
+                if (col % 7 === 0 && d < daysInMonth) {
+                    html += `</tr><tr>`;
+                }
+            }
+
+            // Padding akhir
+            const remaining = 7 - (col % 7);
+            if (remaining < 7) {
+                for (let r = 0; r < remaining; r++) html += `<td></td>`;
+            }
+            html += `</tr></table>`;
+
+            containerEl.innerHTML = html;
+        }
+
+        function updateColePreview() {
+            const colors = getColeColors();
+            const mpr = document.getElementById('coleMonthsPerRow')?.value || 'auto';
+            const grid = document.getElementById('pColeGrid');
+
+            if (grid) {
+                if (mpr === 'auto') {
+                    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(160px,1fr))';
+                } else {
+                    const count = Math.min(parseInt(mpr), 4); // Max 4 shown in preview
+                    grid.style.gridTemplateColumns = `repeat(${count}, 1fr)`;
+                }
+            }
+
+            // Render 4 sample months
+            for (let i = 0; i < 4; i++) {
+                const el = document.getElementById(`pColeM${i + 1}`);
+                if (el) renderColeMonth(el, i, colors);
+            }
+
+            // Legend
+            const legendEl = document.getElementById('pColeLegend');
+            if (legendEl) {
+                const labels = {
+                    orange: 'Pertemuan',
+                    green:  'Laporan',
+                    blue:   'Pelatihan',
+                    red:    'Tgl Merah',
+                    purple: 'Int. IDA',
+                    gray:   'Int. BNU',
+                };
+                legendEl.innerHTML = Object.entries(labels).map(([k, label]) =>
+                    `<span class="pcole-legend-dot" style="background:${colors[k]}">${label}</span>`
+                ).join('');
+            }
+        }
+
+        function getFormValues() {
+            return {
+                bgColor: document.getElementById('bgColor').value,
+                bgColor2: document.getElementById('bgColor2').value,
+                sidebarColor: document.getElementById('sidebarColor').value,
+                sidebarColor2: document.getElementById('sidebarColor2').value,
+                heroBgColor: document.getElementById('heroBgColor').value,
+                heroBgColor2: document.getElementById('heroBgColor2').value,
+                tableHeaderBgColor: document.getElementById('tableHeaderBgColor').value,
+                tableHeaderTextColor: document.getElementById('tableHeaderTextColor').value,
+                accentColor: document.getElementById('accentColor').value,
+                sidebarActiveColor: document.getElementById('sidebarActiveColorText').value || document.getElementById('sidebarActiveColor').value,
+                fontFamily: document.getElementById('fontFamily').value,
+                sidebarFontSize: document.getElementById('sidebarFontSize').value,
+                titleFontSize: document.getElementById('titleFontSize').value,
+                tableFontSize: document.getElementById('tableFontSize').value,
+                tableMinColWidth: document.getElementById('tableMinColWidth').value,
+                tableMaxColWidth: document.getElementById('tableMaxColWidth').value,
+                tableMinRowHeight: document.getElementById('tableMinRowHeight').value,
+                tableMaxRowHeight: document.getElementById('tableMaxRowHeight').value,
+                cardBorderRadius: document.getElementById('cardBorderRadius').value,
+                buttonBorderRadius: document.getElementById('buttonBorderRadius').value,
+                sidebarWidth: document.getElementById('sidebarWidth').value,
+                coleMonthsPerRow: document.getElementById('coleMonthsPerRow').value,
+                coleColorOrange: document.getElementById('coleColorOrange').value,
+                coleColorGreen: document.getElementById('coleColorGreen').value,
+                coleColorBlue: document.getElementById('coleColorBlue').value,
+                coleColorRed: document.getElementById('coleColorRed').value,
+                coleColorPurple: document.getElementById('coleColorPurple').value,
+                coleColorGray: document.getElementById('coleColorGray').value
+            };
+        }
+
+        function saveSettings() {
+            const settings = getFormValues();
+            localStorage.setItem('icms_settings', JSON.stringify(settings));
+
+            // Apply immediately to current page
+            if (window.applyCustomStyles) {
+                window.applyCustomStyles();
+            }
+
+            // Show success message
+            const status = document.getElementById('save-status');
+            if (status) {
+                status.innerHTML = '<span class="success-text">✔️ Pengaturan berhasil disimpan dan diterapkan!</span>';
+                setTimeout(() => {
+                    status.innerHTML = '';
+                }, 3000);
+            }
+        }
+
+        function resetAllSettings() {
+            if (!confirm("⚠️ Apakah Anda yakin ingin mereset seluruh setelan?\nTindakan ini akan mengembalikan warna tema default, serta mereset semua pengaturan kolom, lebar kolom, baris, dan tabel kustom di seluruh halaman.")) {
+                return;
+            }
+            
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key) {
+                    if (
+                        key.startsWith('icms_') ||
+                        key.includes('_multi_packet_list') ||
+                        key.includes('_column_order') ||
+                        key.includes('_visible_cols') ||
+                        key.includes('_col_width') ||
+                        key.includes('_row_height') ||
+                        key.includes('_sort_col') ||
+                        key.includes('_sort_dir') ||
+                        key.includes('_filters') ||
+                        key.includes('_grp_override') ||
+                        key.includes('_custom_tbl') ||
+                        key.includes('_col_widths') ||
+                        key.includes('_row_heights') ||
+                        key.includes('zoom_level')
+                    ) {
+                        keysToRemove.push(key);
+                    }
+                }
+            }
+            
+            keysToRemove.forEach(key => localStorage.removeItem(key));
+            
+            // Show status
+            const status = document.getElementById('save-status');
+            if (status) {
+                status.innerHTML = '<span class="success-text" style="color:#ef4444">✔️ Seluruh setelan berhasil di-reset! Memuat ulang halaman...</span>';
+            }
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        }
+
+        function resetToDefault() {
+            if (confirm('Apakah Anda yakin ingin mengembalikan semua setelan ke bawaan sistem?')) {
+                localStorage.removeItem('icms_settings');
+                populateForm(DEFAULT_SETTINGS);
+                updatePreview();
+
+                // Apply defaults
+                let styleEl = document.getElementById('custom-theme-styles');
+                if (styleEl) {
+                    styleEl.innerHTML = '';
+                }
+
+                // Show status
+                const status = document.getElementById('save-status');
+                if (status) {
+                    status.innerHTML = '<span class="success-text">✔️ Tema kembali ke bawaan sistem.</span>';
+                    setTimeout(() => {
+                        status.innerHTML = '';
+                    }, 3000);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

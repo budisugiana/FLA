@@ -1,0 +1,3408 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summary — Rencana Kerja & Realisasi</title>
+    <!-- Import Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        (function () {
+            const raw = sessionStorage.getItem("icms_session");
+            let valid = false;
+            if (raw) {
+                try {
+                    const s = JSON.parse(raw);
+                    if (s.token && s.expires && new Date(s.expires).getTime() > Date.now()) valid = true;
+                } catch (e) { }
+            }
+            if (!valid) {
+                sessionStorage.removeItem("icms_session");
+                window.location.href = "login.html";
+            }
+        })();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-funnel@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@sgratzl/chartjs-chart-boxplot@4"></script>
+    <script src="core.js"></script>
+
+    <style>
+        /* MODERN SAAS COLOR PALETTE */
+        :root {
+            --primary: #0ea5e9; /* Sky Blue */
+            --primary-hover: #0284c7;
+            --dark: #0f172a; /* Slate 900 */
+            --mid: #f1f5f9; /* Slate 100 */
+            --accent: #0ea5e9; 
+            --bg: #f8fafc; /* Slate 50 */
+            --bg2: #f1f5f9; /* Slate 100 */
+            --border: #e2e8f0; /* Slate 200 */
+            --muted: #64748b; /* Slate 500 */
+            --text: #334155; /* Slate 700 */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius-md: 8px;
+            --radius-lg: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app-shell {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR MODERN */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: #0f172a; /* Solid Slate 900 */
+            color: #f8fafc;
+            padding: 24px 16px;
+            box-shadow: 1px 0 0 rgba(255,255,255,0.1);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 0 8px;
+        }
+
+        .brand-mark {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background: var(--primary);
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            font-size: 16px;
+            color: #fff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .brand-title {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #fff;
+        }
+
+        .brand-subtitle {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .sidebar hr {
+            border: 0;
+            border-top: 1px solid #1e293b;
+            margin: 16px 0;
+        }
+
+        .sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar nav a {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar nav a:hover {
+            background: #1e293b;
+            color: #fff;
+        }
+
+        .sidebar nav a.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding-top: 20px;
+        }
+
+        .small {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .main {
+            margin-left: 260px;
+            flex: 1;
+            padding: 32px 40px;
+            min-width: 0;
+            background: var(--bg);
+        }
+
+        /* HERO SECTION */
+        .hero {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px 32px;
+            color: var(--dark);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary);
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 14px;
+            color: var(--muted);
+            margin: 8px 0 24px;
+        }
+
+        .filter-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters select,
+        .filters input {
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            font-size: 13px;
+            background: #fff;
+            color: var(--dark);
+            min-width: 160px;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filters select:focus,
+        .filters input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .filters input {
+            min-width: 300px;
+            flex: 1;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* BUTTONS MODERNIZATION */
+        .btn {
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .primary:hover { background: var(--primary-hover); }
+
+        .gray {
+            background: #fff;
+            color: var(--text);
+            border-color: var(--border);
+        }
+        .gray:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+        /* Mengganti warna warni dengan varian "Soft" ala SaaS */
+        .cyan { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+        .cyan:hover { background: #bae6fd; }
+
+        .purple { background: #f3e8ff; color: #6b21a8; border-color: #e9d5ff; }
+        .purple:hover { background: #e9d5ff; }
+
+        .red { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+        .red:hover { background: #fecaca; }
+
+        .orange { background: #ffedd5; color: #c2410c; border-color: #fed7aa; }
+        .orange:hover { background: #fed7aa; }
+
+        .teal { background: #ccfbf1; color: #0f766e; border-color: #99f6e4; }
+        .teal:hover { background: #99f6e4; }
+
+        .edit-toggle-btn {
+            cursor: pointer;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #1e293b;
+            color: #cbd5e1;
+            transition: all 0.15s;
+        }
+        .edit-toggle-btn:hover { background: #334155; color: #fff; }
+        .edit-toggle-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+        /* SCORECARDS */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 16px 0 24px;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .label {
+            font-size: 13px;
+            color: var(--muted);
+            padding-right: 44px;
+        }
+
+        .value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-top: 6px;
+            letter-spacing: -0.02em;
+        }
+
+        .card-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .card-actions button, .chart-card-actions button {
+            width: 24px;
+            height: 24px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            background: transparent;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--muted);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-actions button:hover, .chart-card-actions button:hover {
+            background: #f1f5f9;
+            color: var(--dark);
+        }
+
+        /* TABLES */
+        .packet-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin: 24px 0;
+            overflow: hidden;
+        }
+
+        .packet-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            cursor: grab;
+        }
+
+        .packet-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .drag-handle {
+            color: #cbd5e1;
+            cursor: grab;
+            user-select: none;
+            transition: color 0.2s;
+        }
+        .drag-handle:hover { color: var(--muted); }
+
+        .packet-body {
+            padding: 20px;
+            background: #f8fafc; /* Subtle background for table container */
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 32px 0 16px;
+            letter-spacing: -0.01em;
+        }
+
+        .table-wrap {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: auto;
+            max-height: 600px;
+            background: #fff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: max-content;
+            min-width: 100%;
+        }
+
+        /* Clean Table Look */
+        th, td {
+            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
+            text-align: right; /* Default numbers to right */
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        th.left, td.left { text-align: left; }
+
+        th {
+            background: #f8fafc;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            text-align: left;
+        }
+
+        /* Hapus warna selang-seling (zebra), gunakan hover state yang elegan */
+        tr { transition: background 0.15s; background: #fff; }
+        tr:hover { background: #f1f5f9; }
+        tr:last-child td { border-bottom: none; }
+
+        th.sticky-col, td.sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background: inherit; /* inherit from tr to maintain hover effect */
+            border-right: 1px solid var(--border);
+        }
+        th.sticky-col {
+            z-index: 3;
+            background: #f8fafc;
+        }
+
+        .pager {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 16px 0 0;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        /* MODALS */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6); /* Slate overlay */
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            width: min(1000px, 96vw);
+            max-height: 92vh;
+            overflow: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 24px;
+            letter-spacing: -0.01em;
+        }
+
+        .form-section {
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            background: #ffffff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .form-grid.months { grid-template-columns: repeat(6, 1fr); }
+
+        .form-grid label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-grid input,
+        .form-grid textarea {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 10px 12px;
+            font-size: 13px;
+            background: #fff;
+            color: var(--dark);
+            width: 100%;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-grid input:focus, .form-grid textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            justify-content: flex-end; /* Modern modals usually align actions to the right */
+        }
+
+        /* CHARTS */
+        .chart-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-card-title {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 15px;
+        }
+
+        /* MISC & UTILS */
+        .hidden { display: none !important; }
+        .col-hidden { display: none !important; }
+        
+        .hex-input {
+            width: 100px !important;
+            height: 32px !important;
+            padding: 4px 10px !important;
+            font-family: 'SFMono-Regular', Consolas, monospace !important;
+            font-size: 12px !important;
+        }
+        
+        /* List for columns order */
+        .colorder-item {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 6px;
+        }
+
+        /* Mini Buttons */
+        .miniBtn {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            background: #fff;
+            color: var(--text);
+            font-weight: 600;
+            transition: all 0.15s;
+        }
+        .miniBtn:hover {
+            background: #f1f5f9;
+        }
+
+        /* Text Editor specific adjustments */
+        .text-editor {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #fff;
+            padding: 8px 12px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+        .text-editor button, .text-editor select {
+            padding: 6px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #f8fafc;
+            cursor: pointer;
+        }
+        .text-editor button:hover { background: #e2e8f0; }
+
+        @media(max-width:900px) {
+            .sidebar { width: 210px; }
+            .main { margin-left: 210px; padding: 24px; }
+            .form-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-grid.months { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media(max-width:650px) {
+            .sidebar { position: static; width: 100%; height: auto; }
+            .app-shell { display: block; }
+            .main { margin-left: 0; padding: 16px; }
+            .form-grid, .form-grid.months { grid-template-columns: 1fr; }
+            .modal-actions { justify-content: stretch; flex-direction: column; }
+            .modal-actions .btn { width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">LSV</div>
+                <div>
+                    <div class="brand-title">Kartu Kontrol</div>
+                    <div class="brand-subtitle">Budget Monitoring</div>
+                </div>
+            </div>
+            <hr>
+            <nav>
+                <a class="active" href="index.html">
+                    <svg style="margin-right:8px; width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    SUMMARY
+                </a>
+                <a href="rka.html">▤ RENCANA KERJA ANGGARAN</a>
+                <a href="createkelas.html">⊞ PEMBUATAN KELAS</a>
+                <a href="konfirmasiprogram.html">☑ KONFIRMASI PROGRAM (UIC)</a>
+                <a href="pengeluaran.html">⛃ KONFIRMASI PEMBUKUAN (OSB)</a>
+                <a href="keu_smarter.html" style="padding-left:32px">↳ SMARTER</a>
+                <a href="keu_portal.html" style="padding-left:32px">↳ PORTAL</a>
+                <a href="keu_other.html" style="padding-left:32px">↳ OTHER</a>
+                <a id="navUsers" href="users.html" style="display:none">⚿ KELOLA USER</a>
+                <a id="navCole" href="cole.html">📅 COLE</a>
+                <a id="navSettings" href="settings.html">⚙ PENGATURAN</a>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="small" id="whoami" style="margin-bottom:12px; font-weight: 600;">Memuat...</div>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.05);">
+                    <span style="font-size:12px;font-weight:500;opacity:0.8">Ukuran Font</span>
+                    <div style="display:flex;gap:4px">
+                        <button onclick="changeFontSize(-1)" class="edit-toggle-btn active" title="Perkecil Text">A-</button>
+                        <button onclick="changeFontSize(1)" class="edit-toggle-btn active" title="Perbesar Text">A+</button>
+                    </div>
+                </div>
+
+                <div id="adminEditPanel" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                    <span style="font-size:12px;font-weight:500;opacity:0.8">Panel Edit</span>
+                    <button id="globalEditToggleBtn" class="edit-toggle-btn active" onclick="toggleAllEditPanels()">👁️ Sembunyikan</button>
+                </div>
+                <button class="btn gray" style="width:100%; justify-content: center;" onclick="logout()">🚪 Logout</button>
+                <div style="text-align:center;font-size:11px;color:rgba(255,255,255,0.4);margin-top:16px;">
+                    AI-Powered. Experience-Driven.
+                </div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <section class="hero">
+                <h1 id="summaryTitle">SUMMARY</h1>
+                <p>Tracking program, periode pelaksanaan, realisasi bulanan, dan akrual biaya per program.</p>
+
+                <script>
+                    function formatText(property, value) {
+                        document.getElementById('summaryTitle').style[property] = value;
+                    }
+                </script>
+
+                <div class="filter-title">Filter Data Global</div>
+                <div class="filters">
+                    <select id="filterUnit">
+                        <option value="">Semua Anggaran UNIT</option>
+                    </select>
+                    <input id="searchInput" placeholder="Cari Anggaran UNIT...">
+                    <button class="btn primary" onclick="applyFilters()">Terapkan</button>
+                    <button class="btn gray" onclick="resetFilters()">Reset</button>
+                </div>
+
+                <div class="actions">
+                    <button class="btn primary" onclick="openAdd()">+ Tambah Baris</button>
+                    <button class="btn cyan" onclick="document.getElementById('fileImport').click()">Import Excel</button>
+                    <input id="fileImport" type="file" accept=".xlsx,.xls,.csv,.tsv,.txt" hidden onchange="importExcel(event)">
+                    <button class="btn gray" onclick="exportExcel()">Export Excel</button>
+                    <button class="btn gray" onclick="downloadTemplate()">Template</button>
+                    <button class="btn red" style="margin-left:auto;" onclick="deleteAllData()">Hapus Semua Data</button>
+                </div>
+                <div id="alert" style="margin-top:12px; font-size:13px; font-weight:500;"></div>
+            </section>
+
+            <div class="section-title">
+                <span>Scorecard</span>
+                <div style="display:flex;gap:8px">
+                    <button class="btn primary edit-controlled-feature-btn" onclick="openScorecardModal()">+ Tambah Scorecard</button>
+                </div>
+            </div>
+            <div id="scorecardsContainer"></div>
+
+            <div class="section-title">
+                <span>Grafik Analytics</span>
+                <div style="display:flex;gap:8px">
+                    <button class="btn primary edit-controlled-feature-btn" onclick="openChartModal()">+ Tambah Grafik</button>
+                </div>
+            </div>
+            <div id="chartsContainer"></div>
+
+            <div class="section-title" style="margin-top:40px">
+                <span>Data Tabel Detail</span>
+                <div style="display:flex;gap:8px">
+                    <button class="btn primary edit-controlled-feature-btn" onclick="openAddTableModal()">+ Tambah Tabel</button>
+                </div>
+            </div>
+            <div id="packetsContainer"></div>
+        </main>
+    </div>
+
+    <!-- Modal Tambah/Edit Data -->
+    <div id="modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-title" id="modalTitle">Tambah Baris Summary</div>
+            <form id="dataForm" onsubmit="saveData(event)">
+                <input type="hidden" id="f_id">
+                <div id="formSections"></div>
+                <div class="modal-actions">
+                    <button class="btn gray" type="button" onclick="closeModal()">Batal</button>
+                    <button class="btn primary" type="submit">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Format -->
+    <div id="formatModal" class="modal-overlay hidden">
+        <div class="modal-box" style="width:min(460px,94vw)">
+            <div class="modal-title" id="formatModalTitle">Format Baris</div>
+            <input type="hidden" id="fmt_packet">
+            <input type="hidden" id="fmt_id">
+            <input type="hidden" id="fmt_type" value="row">
+
+            <div class="form-section">
+                <div class="form-section-title">Warna Latar Belakang</div>
+                <div class="fmt-row" style="display:flex; gap:8px; align-items:center;">
+                    <input type="checkbox" id="fmt_use_bg" onchange="toggleFmtField('fmt_use_bg','fmt_bg')"> 
+                    <span style="font-size:13px">Aktifkan warna custom</span>
+                    <div class="hex-color-control" style="margin-left:auto; display:flex; gap:8px;">
+                        <input type="color" id="fmt_bg" class="color-input" oninput="syncColorHex('fmt_bg','fmt_bg_hex')" style="width:32px;height:32px;border-radius:4px;border:1px solid var(--border);">
+                        <input type="text" id="fmt_bg_hex" class="hex-input" value="#FFFFFF" maxlength="7" placeholder="#RRGGBB" oninput="syncHexColor('fmt_bg_hex','fmt_bg')">
+                    </div>
+                </div>
+                <div class="color-recommendations" id="fmt_bg_recs" style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;"></div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">Warna Teks</div>
+                <div class="fmt-row" style="display:flex; gap:8px; align-items:center;">
+                    <input type="checkbox" id="fmt_use_color" onchange="toggleFmtField('fmt_use_color','fmt_color')">
+                    <span style="font-size:13px">Aktifkan warna custom</span>
+                    <div class="hex-color-control" style="margin-left:auto; display:flex; gap:8px;">
+                        <input type="color" id="fmt_color" class="color-input" oninput="syncColorHex('fmt_color','fmt_color_hex')" style="width:32px;height:32px;border-radius:4px;border:1px solid var(--border);">
+                        <input type="text" id="fmt_color_hex" class="hex-input" value="#1E3A3A" maxlength="7" placeholder="#RRGGBB" oninput="syncHexColor('fmt_color_hex','fmt_color')">
+                    </div>
+                </div>
+                <div class="color-recommendations" id="fmt_color_recs" style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;"></div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">Tipografi & Layout</div>
+                <div class="fmt-row" style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
+                    <input type="checkbox" id="fmt_use_size" onchange="toggleFmtField('fmt_use_size','fmt_size')">
+                    <span style="font-size:13px">Ukuran Teks</span>
+                    <input type="number" id="fmt_size" min="8" max="28" step="0.5" style="margin-left:auto; width:80px; padding:6px; border:1px solid var(--border); border-radius:6px;">
+                </div>
+                <div class="fmt-row" style="display:flex; gap:8px; align-items:center;">
+                    <input type="checkbox" id="fmt_bold"> 
+                    <span style="font-size:13px">Cetak Tebal (Bold)</span>
+                </div>
+            </div>
+
+            <div class="form-section" id="fmt_align_section">
+                <div class="form-section-title">Perataan Teks</div>
+                <select id="fmt_align" style="width:100%; border:1px solid var(--border); border-radius:6px; padding:8px 12px; font-size:13px;">
+                    <option value="">Bawaan Sistem</option>
+                    <option value="left">Rata Kiri</option>
+                    <option value="center">Rata Tengah</option>
+                    <option value="right">Rata Kanan</option>
+                </select>
+            </div>
+
+            <div class="form-section" id="fmt_dataformat_section">
+                <div class="form-section-title">Format Data</div>
+                <select id="fmt_dataformat" style="width:100%; border:1px solid var(--border); border-radius:6px; padding:8px 12px; font-size:13px;">
+                    <option value="">Bawaan Tipe Kolom</option>
+                    <option value="text">Teks Normal</option>
+                    <option value="number">Angka Bulat</option>
+                    <option value="decimal2">Angka Desimal (2 digit)</option>
+                    <option value="money">Format Rupiah (Rp)</option>
+                    <option value="percent">Persentase (%)</option>
+                </select>
+            </div>
+
+            <div class="form-section" id="fmt_wrap_section">
+                <label style="display:flex; gap:8px; align-items:center; font-size:13px;">
+                    <input type="checkbox" id="fmt_wrap"> Bungkus teks otomatis (Wrap Text)
+                </label>
+            </div>
+
+            <div class="form-section" id="fmt_width_section">
+                <div class="form-section-title">Lebar Kolom</div>
+                <div class="fmt-row" style="display:flex; gap:8px; align-items:center;">
+                    <input type="checkbox" id="fmt_use_width" onchange="toggleFmtField('fmt_use_width','fmt_width')">
+                    <span style="font-size:13px">Lebar Custom</span>
+                    <input type="number" id="fmt_width" min="40" max="600" step="5" style="margin-left:auto; width:80px; padding:6px; border:1px solid var(--border); border-radius:6px;">
+                    <span style="font-size:12px; color:var(--muted)">px</span>
+                </div>
+            </div>
+
+            <div class="form-section" id="fmt_height_section">
+                <div class="form-section-title">Tinggi Baris</div>
+                <div class="fmt-row" style="display:flex; gap:8px; align-items:center;">
+                    <input type="checkbox" id="fmt_use_height" onchange="toggleFmtField('fmt_use_height','fmt_height')">
+                    <span style="font-size:13px">Tinggi Custom</span>
+                    <input type="number" id="fmt_height" min="18" max="200" step="2" style="margin-left:auto; width:80px; padding:6px; border:1px solid var(--border); border-radius:6px;">
+                    <span style="font-size:12px; color:var(--muted)">px</span>
+                </div>
+            </div>
+
+            <div class="form-section" id="fmt_label_section">
+                <div class="form-section-title">Ganti Nama Header</div>
+                <input type="text" id="fmt_label" placeholder="Kosongkan untuk pakai nama asli" style="width:100%; border:1px solid var(--border); border-radius:6px; padding:8px 12px; font-size:13px;">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn gray" type="button" onclick="closeFormatModal()">Batal</button>
+                <button class="btn orange" type="button" onclick="resetFormat()">Reset Default</button>
+                <button class="btn primary" type="button" onclick="saveFormat()">Terapkan Format</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah/Edit Scorecard -->
+    <div id="scorecardModal" class="modal-overlay hidden">
+        <div class="modal-box" style="width:min(640px,96vw)">
+            <div class="modal-title" id="scorecardModalTitle">Konfigurasi Scorecard</div>
+            <input type="hidden" id="sc_id">
+
+            <div class="form-section">
+                <div class="form-section-title">Judul Scorecard</div>
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <input type="text" id="sc_icon" maxlength="2" placeholder="🔖" style="width:60px;text-align:center;border:1px solid var(--border);border-radius:6px;padding:10px;font-size:18px" title="Emoji ikon">
+                    <input type="text" id="sc_title" placeholder="Contoh: Total Realisasi Full Year" style="flex:1;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:14px;width:100%">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title" style="display:flex;align-items:center;justify-content:space-between">
+                    <span>Metrik Data yang Ditampilkan</span>
+                    <button type="button" class="btn cyan" style="padding:4px 12px; font-size:12px;" onclick="addScorecardMetric()">+ Tambah Metrik</button>
+                </div>
+                <div class="sc-metric-list" id="sc_metricList" style="margin-top:16px; display:flex; flex-direction:column; gap:12px;"></div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">Tampilan (Styling)</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:16px;">
+                    <div>
+                        <label style="font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; display:block;">Warna Background</label>
+                        <div style="display:flex; gap:8px;">
+                            <input type="color" id="sc_bgColor" class="color-input" oninput="syncColorHex('sc_bgColor','sc_bgColor_hex')" style="width:36px;height:36px;border-radius:6px;border:1px solid var(--border);">
+                            <input type="text" id="sc_bgColor_hex" class="hex-input" maxlength="7" style="flex:1; border:1px solid var(--border); border-radius:6px; padding:8px; font-size:12px;" oninput="syncHexColor('sc_bgColor_hex','sc_bgColor')">
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; display:block;">Warna Teks Utama</label>
+                        <div style="display:flex; gap:8px;">
+                            <input type="color" id="sc_textColor" class="color-input" oninput="syncColorHex('sc_textColor','sc_textColor_hex')" style="width:36px;height:36px;border-radius:6px;border:1px solid var(--border);">
+                            <input type="text" id="sc_textColor_hex" class="hex-input" maxlength="7" style="flex:1; border:1px solid var(--border); border-radius:6px; padding:8px; font-size:12px;" oninput="syncHexColor('sc_textColor_hex','sc_textColor')">
+                        </div>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px;">
+                     <div>
+                        <label style="font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; display:block;">Ukuran Angka (px)</label>
+                        <input type="number" id="sc_valueSize" min="10" max="48" step="1" style="width:100%; border:1px solid var(--border); border-radius:6px; padding:8px; font-size:13px;">
+                     </div>
+                     <div>
+                        <label style="font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; display:block;">Ukuran Label (px)</label>
+                        <input type="number" id="sc_labelSize" min="8" max="24" step="1" style="width:100%; border:1px solid var(--border); border-radius:6px; padding:8px; font-size:13px;">
+                     </div>
+                     <div>
+                        <label style="font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; display:block;">Ukuran Kartu</label>
+                        <select id="sc_cardSize" style="width:100%; border:1px solid var(--border); border-radius:6px; padding:8px; font-size:13px;">
+                            <option value="sm">Kecil</option>
+                            <option value="md">Sedang</option>
+                            <option value="lg">Besar</option>
+                            <option value="xl">Sangat Besar</option>
+                        </select>
+                     </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn gray" type="button" onclick="closeScorecardModal()">Batal</button>
+                <button class="btn primary" type="button" onclick="saveScorecardModal()">Simpan Scorecard</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Tabel Baru -->
+    <div id="addTableModal" class="modal-overlay hidden">
+        <div class="modal-box" style="width:min(600px,96vw)">
+            <div class="modal-title">Tambah Tabel Data</div>
+
+            <div class="form-section">
+                <div class="form-section-title">Sumber Data</div>
+                <div style="display:flex;flex-direction:column;gap:12px">
+                    <label style="display:flex;align-items:center;gap:12px;font-size:13px;font-weight:500;color:var(--text); cursor:pointer;">
+                        <input type="radio" name="newTableSource" value="summary" checked onchange="onNewTableSourceChange()" style="width:18px;height:18px;accent-color:var(--primary);">
+                        📊 Data Ringkasan (Sheet "summary")
+                    </label>
+                    <label style="display:flex;align-items:center;gap:12px;font-size:13px;font-weight:500;color:var(--text); cursor:pointer;">
+                        <input type="radio" name="newTableSource" value="sheet" onchange="onNewTableSourceChange()" style="width:18px;height:18px;accent-color:var(--primary);">
+                        🗂️ Referensi Sheet Lain (Baca-saja)
+                    </label>
+                    <label style="display:flex;align-items:center;gap:12px;font-size:13px;font-weight:500;color:var(--text); cursor:pointer;">
+                        <input type="radio" name="newTableSource" value="duplicate" onchange="onNewTableSourceChange()" style="width:18px;height:18px;accent-color:var(--primary);">
+                        📄 Duplikat Layout Tabel Saat Ini
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">Judul Tabel</div>
+                <input type="text" id="newTable_title" placeholder="Masukkan judul..." style="width:100%;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:13px;">
+            </div>
+
+            <div class="form-section" id="newTableGroupsSection">
+                <div class="form-section-title">Kolom Default yang Tampil</div>
+                <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Pilih grup kolom awal. Bisa diubah nanti.</div>
+                <div style="display:flex; gap:8px; margin-bottom:16px;">
+                    <button class="btn gray" style="padding:4px 10px; font-size:12px;" type="button" onclick="toggleAllNewTableGroups(true)">Pilih Semua</button>
+                    <button class="btn gray" style="padding:4px 10px; font-size:12px;" type="button" onclick="toggleAllNewTableGroups(false)">Kosongkan</button>
+                </div>
+                <div id="newTableGroups" style="max-height:260px; overflow-y:auto; padding-right:10px;"></div>
+            </div>
+
+            <div class="form-section hidden" id="newTableSheetSection">
+                <div class="form-section-title">Pilih Sheet</div>
+                <select id="newTable_sheet" style="width:100%;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:13px;"></select>
+            </div>
+
+            <div class="form-section hidden" id="newTableDuplicateSection">
+                <div class="form-section-title">Pilih Tabel Sumber</div>
+                <select id="newTable_duplicateFrom" style="width:100%;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:13px;"></select>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn gray" type="button" onclick="closeAddTableModal()">Batal</button>
+                <button class="btn primary" type="button" onclick="saveAddTableModal()">Buat Tabel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Buat/Edit Grafik -->
+    <div id="chartModal" class="modal-overlay hidden">
+        <div class="modal-box" style="width:min(680px,96vw)">
+            <div class="modal-title" id="chartModalTitle">Konfigurasi Grafik</div>
+            <input type="hidden" id="chart_id">
+
+            <div class="form-section">
+                <div class="form-section-title">Judul Grafik</div>
+                <input type="text" id="chart_title" placeholder="Contoh: Perbandingan Target IDR" style="width:100%;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:13px;">
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                <div class="form-section">
+                    <div class="form-section-title">Posisi Baris (Row)</div>
+                    <select id="chart_row" style="width:100%;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:13px;">
+                        <option value="1">Baris 1</option>
+                        <option value="2">Baris 2</option>
+                        <option value="3">Baris 3</option>
+                        <option value="4">Baris 4</option>
+                        <option value="5">Baris 5</option>
+                    </select>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Tipe Grafik</div>
+                    <select id="chart_type" style="width:100%;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:13px;">
+                        <optgroup label="Grafik Perbandingan">
+                            <option value="bar">Column Chart</option>
+                            <option value="barh">Bar Chart (Horizontal)</option>
+                            <option value="clusteredColumn">Clustered Column</option>
+                            <option value="stackedColumn">Stacked Column</option>
+                        </optgroup>
+                        <optgroup label="Grafik Tren & Proporsi">
+                            <option value="line">Line Chart</option>
+                            <option value="area">Area Chart</option>
+                            <option value="pie">Pie Chart</option>
+                            <option value="doughnut">Doughnut Chart</option>
+                        </optgroup>
+                        <!-- Biarkan opsi lainnya sesuai JS asli -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">Sumbu X (Label Kategori)</div>
+                <select id="chart_labelField" onchange="onChartLabelFieldChange()" style="width:100%;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:13px;"></select>
+                
+                <div style="margin-top:16px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="font-size:12px; font-weight:600; color:var(--muted);">Filter Kategori yang Tampil:</span>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn gray" style="padding:2px 8px; font-size:11px;" type="button" onclick="toggleAllChartLabelValues(true)">Pilih Semua</button>
+                            <button class="btn gray" style="padding:2px 8px; font-size:11px;" type="button" onclick="toggleAllChartLabelValues(false)">Kosongkan</button>
+                        </div>
+                    </div>
+                    <div id="chartLabelValues" style="max-height:180px; overflow-y:auto; border:1px solid var(--border); border-radius:6px; padding:8px;"></div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">Sumbu Y (Kolom Nilai / Metrik)</div>
+                <div id="chartValueGroups" style="max-height:200px; overflow-y:auto; border:1px solid var(--border); border-radius:6px; padding:12px;"></div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">Pengaturan Lanjutan</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                    <label style="display:flex; gap:8px; align-items:center; font-size:13px; cursor:pointer;">
+                        <input type="checkbox" id="chart_sort" style="width:18px;height:18px;accent-color:var(--primary);"> Urutkan dari tertinggi
+                    </label>
+                    <label style="display:flex; gap:8px; align-items:center; font-size:13px; cursor:pointer;">
+                        <input type="checkbox" id="chart_showLabels" style="width:18px;height:18px;accent-color:var(--primary);"> Tampilkan angka di grafik
+                    </label>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:16px;">
+                    <div>
+                        <label style="font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; display:block;">Format Angka</label>
+                        <select id="chart_numberFormat" style="width:100%;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:13px;">
+                            <option value="full">Angka Penuh</option>
+                            <option value="rupiah">Rupiah (Rp)</option>
+                            <option value="juta">Dalam Juta</option>
+                            <option value="milyar">Dalam Milyar</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; display:block;">Batas Data (Top N)</label>
+                        <input type="number" id="chart_topn" min="0" step="1" value="0" placeholder="0 = Tampil Semua" style="width:100%;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:13px;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn gray" type="button" onclick="closeChartModal()">Batal</button>
+                <button class="btn primary" type="button" onclick="saveChartModal()">Simpan Grafik</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Header Kolom & Judul Tabel -->
+    <div id="headerEditModal" class="modal-overlay hidden">
+        <div class="modal-box" style="width:min(700px,96vw)">
+            <div class="modal-title" id="headerEditModalTitle">Edit Judul & Header</div>
+            <input type="hidden" id="headerEdit_packet">
+
+            <div class="form-section">
+                <div class="form-section-title">Nama Tabel Utama</div>
+                <input type="text" id="tableTitleInput" style="width:100%;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:14px;font-weight:600;">
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">Alias Header per Kolom</div>
+                <div style="font-size:12px; color:var(--muted); margin-bottom:12px;">Kosongkan input untuk menggunakan nama kolom bawaan sistem.</div>
+                <div id="headerEditGroups" style="max-height:400px; overflow-y:auto; padding-right:10px;"></div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn gray" type="button" onclick="closeHeaderEditModal()">Batal</button>
+                <button class="btn orange" type="button" onclick="resetAllHeaderEdits()">Reset ke Default</button>
+                <button class="btn primary" type="button" onclick="saveHeaderEdits()">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Atur Urutan Kolom -->
+    <div id="columnOrderModal" class="modal-overlay hidden">
+        <div class="modal-box" style="width:min(560px,96vw)">
+            <div class="modal-title" id="columnOrderModalTitle">Atur Urutan Kolom</div>
+            <input type="hidden" id="columnOrder_packet">
+            <p style="font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.5;">
+                Drag & Drop ikon ⠿ untuk memindahkan kolom, atau gunakan panah ▲▼ di tiap baris.
+            </p>
+            <input type="text" id="columnOrderSearch" style="width:100%;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:13px;margin-bottom:16px;" placeholder="Cari nama kolom..." oninput="renderColumnOrderList()">
+            <div id="columnOrderList" style="max-height:50vh; overflow-y:auto; padding-right:8px; display:flex; flex-direction:column; gap:8px;"></div>
+            <div class="modal-actions">
+                <button class="btn orange" type="button" onclick="resetColumnOrderFromModal()">Reset Urutan Asli</button>
+                <button class="btn primary" type="button" onclick="closeColumnOrderModal()">Selesai</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Text Editor Floating Tool -->
+    <div class="text-editor">
+        <select id="fontSize" onchange="formatText('fontSize', this.value)">
+            <option value="12px">12px</option>
+            <option value="14px">14px</option>
+            <option value="16px">16px</option>
+            <option value="20px">20px</option>
+            <option value="24px" selected>24px</option>
+            <option value="32px">32px</option>
+        </select>
+        <button onclick="formatText('fontWeight', 'bold')" title="Bold"><b>B</b></button>
+        <button onclick="formatText('fontStyle', 'italic')" title="Italic"><i>I</i></button>
+        <button onclick="formatText('textDecoration', 'underline')" title="Underline"><u>U</u></button>
+        <button onclick="formatText('textAlign', 'left')" title="Align Left">⬅</button>
+        <button onclick="formatText('textAlign', 'center')" title="Align Center">↔</button>
+        <button onclick="formatText('textAlign', 'right')" title="Align Right">➡</button>
+    </div>
+
+    <!-- 
+    ========================================================================
+    JAVASCRIPT LOGIC
+    TIDAK ADA PERUBAHAN LOGIKA DARI KODE ASLI ANDA
+    ======================================================================== 
+    -->
+    <script>
+        // ============================================================
+        // KONFIGURASI API — satu sumber data untuk semua paket tabel
+        let _currentZoom = 1;
+        function changeFontSize(step) {
+            _currentZoom += step * 0.05;
+            if (_currentZoom < 0.8) _currentZoom = 0.8;
+            if (_currentZoom > 1.3) _currentZoom = 1.3;
+            document.querySelector('.main').style.zoom = _currentZoom;
+        }
+
+        const API_URL = "https://script.google.com/macros/s/AKfycbyJoZ2eU7rcPjoiQDERgrwAu2_wSL-AQ9wP46-7neFspaXYIVHDyD4F1p6q4XCBWVMx/exec";
+        const API_KEY = "2026-BNU-KARTUKONTROL";
+        const SHEET_NAME = "summary";
+        const PAGE_SIZE = 30;
+
+        // ------------------------------------------------------------
+        // DEFINISI KOLOM
+        // ------------------------------------------------------------
+        const BASE_FIELDS = [
+            { key: "Anggaran UNIT", type: "text" },
+            { key: "Target IDR", type: "number" },
+            { key: "Target Proposional IDR", type: "number" },
+            { key: "Realisasi H-1", type: "number" },
+            { key: "Pipeline Next Month", type: "number" },
+            { key: "Proyeksi Next Month", type: "number" },
+            { key: "Realisasi Thd Proposional IDR", type: "number" },
+            { key: "Realisasi Thd Proposional %", type: "number" },
+            { key: "Realisasi Thd Full Year IDR", type: "number" },
+            { key: "Realisasi Thd Full Year %", type: "number" },
+            { key: "Proyeksi Thd Proposional IDR", type: "number" },
+            { key: "Proyeksi Thd Proposional %", type: "number" },
+            { key: "Proyeksi Thd Full Year IDR", type: "number" },
+            { key: "Proyeksi Thd Full Year %", type: "number" }
+        ];
+        const MONTH_BLOCKS = [
+            { prefix: "BLN", total: "TOTAL BLN", group: "Realisasi Bulanan" },
+            { prefix: "AKUM BLN", total: "TOTAL AKUM", group: "Akumulasi Realisasi" },
+            { prefix: "OUTBLN", total: "TOTAL OUTBLN", group: "Outlook Bulanan" },
+            { prefix: "AKUM OUTBLN", total: "TOTAL AKUM OUTBLN", group: "Akumulasi Outlook" },
+            { prefix: "PROG BLN", total: "TOTAL PROG", group: "Program Bulanan" },
+            { prefix: "SUB PROG BLN", total: "TOTAL SUB PROG", group: "Sub Program Bulanan" },
+            { prefix: "KELAS BLN", total: "TOTAL KELAS", group: "Kelas Bulanan" },
+            { prefix: "LEARNER BLN", total: "TOTAL LEARNER", group: "Learner Bulanan" },
+            { prefix: "RBLN", total: "RTOTAL BLN", group: "Realisasi (R) Bulanan" },
+            { prefix: "RAKUM BLN", total: "RTOTAL AKUM", group: "Akumulasi (R)" },
+            { prefix: "RPROG BLN", total: "RTOTAL PROG", group: "Program (R)" },
+            { prefix: "RSUB PROG BLN", total: "RTOTAL SUB PROG", group: "Sub Program (R)" },
+            { prefix: "RKELAS BLN", total: "RTOTAL KELAS", group: "Kelas (R)" },
+            { prefix: "RLEARNER BLN", total: "RTOTAL LEARNER", group: "Learner (R)" }
+        ];
+        function buildFieldDefs() {
+            const defs = [];
+            BASE_FIELDS.forEach(f => defs.push({ key: f.key, label: f.key, type: f.type, group: "Ringkasan Anggaran" }));
+            MONTH_BLOCKS.forEach(b => {
+                for (let i = 1; i <= 12; i++) defs.push({ key: b.prefix + " " + i, label: b.prefix + " " + i, type: "number", group: b.group });
+                defs.push({ key: b.total, label: b.total, type: "number", group: b.group });
+            });
+            return defs;
+        }
+        const FIELD_DEFS = buildFieldDefs();
+        const GROUPS = ["Ringkasan Anggaran", ...MONTH_BLOCKS.map(b => b.group)];
+        function cssKey(k) { return k.replace(/[^a-zA-Z0-9]/g, "_"); }
+
+        function defaultPacketConfigs() {
+            return [
+                { id: "p1", icon: "📊", title: "Ringkasan & Realisasi Bulanan", groups: ["Ringkasan Anggaran", "Realisasi Bulanan", "Akumulasi Realisasi"] },
+                { id: "p2", icon: "🔭", title: "Outlook & Program Bulanan", groups: ["Outlook Bulanan", "Akumulasi Outlook", "Program Bulanan"] },
+                { id: "p3", icon: "🗂️", title: "Sub Program, Kelas & Learner Bulanan", groups: ["Sub Program Bulanan", "Kelas Bulanan", "Learner Bulanan"] },
+                { id: "p4", icon: "🔁", title: "Realisasi (R), Akumulasi (R) & Program (R)", groups: ["Realisasi (R) Bulanan", "Akumulasi (R)", "Program (R)"] },
+                { id: "p5", icon: "🎯", title: "Sub Program (R), Kelas (R) & Learner (R)", groups: ["Sub Program (R)", "Kelas (R)", "Learner (R)"] }
+            ];
+        }
+
+        let allData = [];
+        let filteredData = [];
+        const rowDataMap = new Map();
+
+        // CHARTS
+        const CHARTS_KEY = "icms_multi_charts_v1";
+        const CHART_PALETTE = ["#0ea5e9", "#10b981", "#f59e0b", "#8b5cf6", "#ef4444", "#14b8a6", "#eab308", "#3b82f6", "#ec4899", "#22c55e"];
+        let charts = [];
+        let chartInstances = {};
+        
+        function loadCharts() {
+            try { const raw = localStorage.getItem(CHARTS_KEY); return raw ? JSON.parse(raw) : []; }
+            catch (e) { return []; }
+        }
+        function saveCharts() { localStorage.setItem(CHARTS_KEY, JSON.stringify(charts)); }
+
+        function renderCharts() {
+            const container = document.getElementById("chartsContainer");
+            if (!charts.length) {
+                container.innerHTML = `<div style="border: 1.5px dashed var(--border); border-radius: var(--radius-lg); padding: 40px; text-align: center; color: var(--muted); background: #fff;">Belum ada grafik. Klik "+ Tambah Grafik" untuk membuat analisis visual.</div>`;
+                return;
+            }
+            const rowsHtml = [1, 2, 3, 4, 5].map(rowNum => {
+                const rowCharts = charts.filter(cfg => (Number(cfg.row) || 1) === rowNum);
+                if (!rowCharts.length) return "";
+                return `<div class="chart-row" data-chart-row="${rowNum}">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 16px; margin-bottom: 16px;">${rowCharts.map(cfg => `
+        <div class="chart-card" data-chart-id="${escapeAttr(cfg.id)}">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+            <div>
+              <div class="chart-card-title">${escapeHtml(cfg.title || "Grafik")}</div>
+              <div style="font-size: 11px; color: var(--muted); margin-top: 4px;">${escapeHtml(chartTypeLabel(cfg.type))} • ${escapeHtml((cfg.valueFields || []).map(f => f === "__COUNT__" ? "Jumlah Baris" : f).join(", "))}</div>
+            </div>
+            <div class="chart-card-actions">
+              <button data-chart-action="toggle-labels" data-chart-id="${escapeAttr(cfg.id)}" style="${cfg.showLabels === false ? 'opacity: 0.4' : ''}" title="Tampilkan/Sembunyikan Angka">🔢</button>
+              <button data-chart-action="edit" data-chart-id="${escapeAttr(cfg.id)}" title="Edit grafik">✏️</button>
+              <button data-chart-action="delete" data-chart-id="${escapeAttr(cfg.id)}" title="Hapus grafik">🗑️</button>
+            </div>
+          </div>
+          <div style="position: relative; height: 280px;"><canvas id="canvas_${escapeAttr(cfg.id)}"></canvas></div>
+        </div>
+      `).join("")}</div>
+    </div>`;
+            }).join("");
+            container.innerHTML = rowsHtml;
+            charts.forEach(cfg => renderChartInstance(cfg));
+        }
+        
+        function chartTypeLabel(t) {
+            const m = {
+                bar: "Column Chart", barh: "Bar Chart", clusteredColumn: "Clustered Column Chart",
+                stackedColumn: "Stacked Column Chart", stacked100Column: "100% Stacked Column Chart",
+                clusteredBar: "Clustered Bar Chart", stackedBar: "Stacked Bar Chart",
+                line: "Line Chart", area: "Area Chart", stackedArea: "Stacked Area Chart", combo: "Combo Chart",
+                pie: "Pie Chart", doughnut: "Doughnut Chart", treemap: "Treemap", sunburst: "Sunburst Chart",
+                gauge: "Gauge Chart", bullet: "Bullet Chart", progress: "Progress Chart", kpi: "KPI Card", radialBar: "Radial Bar Chart",
+                scatter: "Scatter Plot", bubble: "Bubble Chart", histogram: "Histogram", boxplot: "Box & Whisker Chart",
+                waterfall: "Waterfall Chart", funnel: "Funnel Chart", timeline: "Timeline Chart", gantt: "Gantt Chart",
+                calendarHeatmap: "Calendar Heatmap", heatmap: "Heatmap"
+            };
+            return m[t] || t;
+        }
+
+        function formatChartValue(v, format) {
+            if (v === null || v === undefined || isNaN(v)) return '';
+            const num = Number(v);
+            switch (format) {
+                case 'rupiah': return 'Rp ' + num.toLocaleString('id-ID');
+                case 'juta': return (num / 1000000).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' Jt';
+                case 'milyar': return (num / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' M';
+                case 'full': default: return num.toLocaleString('id-ID');
+            }
+        }
+
+        function getLegendConfig(display = true, fontSize = 11) {
+            return {
+                display,
+                labels: {
+                    font: { size: fontSize, family: 'Inter' },
+                    generateLabels: function (chart) {
+                        let original = [];
+                        try { original = Chart.defaults.plugins.legend.labels.generateLabels(chart); } catch (e) { return []; }
+                        const fmt = chart.options.plugins.tooltip?.numberFormat || 'full';
+                        original.forEach(label => {
+                            if (['pie', 'doughnut', 'polarArea'].includes(chart.config.type)) {
+                                const val = chart.data.datasets[0].data[label.index];
+                                if (val !== undefined) label.text = `${label.text} (${formatChartValue(val, fmt)})`;
+                            } else {
+                                const ds = chart.data.datasets[label.datasetIndex];
+                                if (ds && ds.data) {
+                                    const sum = ds.data.reduce((a, b) => a + (Number(b) || 0), 0);
+                                    label.text = `${label.text} (${formatChartValue(sum, fmt)})`;
+                                }
+                            }
+                        });
+                        return original;
+                    }
+                }
+            };
+        }
+
+        function chartBaseOptions() {
+            return {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: getLegendConfig(true), title: { display: false } },
+                scales: { 
+                    x: { ticks: { font: { size: 11, family: 'Inter' } }, grid: { display: false } }, 
+                    y: { ticks: { font: { size: 11, family: 'Inter' } }, beginAtZero: true, border: { dash: [4, 4] } } 
+                }
+            };
+        }
+
+        function renderChartInstance(cfg) {
+            const canvas = document.getElementById("canvas_" + cfg.id);
+            if (!canvas || typeof Chart === "undefined") return;
+            if (chartInstances[cfg.id]) { chartInstances[cfg.id].destroy(); delete chartInstances[cfg.id]; }
+
+            let source = filteredData.slice();
+            if (cfg.labelValues && cfg.labelValues.length) {
+                const allowed = new Set(cfg.labelValues.map(String));
+                source = source.filter(r => allowed.has(String(r[cfg.labelField] ?? "")));
+            }
+            const primaryField = (cfg.valueFields || [])[0];
+            if (cfg.sortDesc && primaryField) {
+                source.sort((a, b) => (Number(b[primaryField]) || 0) - (Number(a[primaryField]) || 0));
+            } else if (cfg.labelValues && cfg.labelValues.length) {
+                const labelOrder = {};
+                cfg.labelValues.forEach((val, idx) => { labelOrder[String(val).trim()] = idx; });
+                source.sort((a, b) => {
+                    const labelA = String(a[cfg.labelField] ?? "").trim();
+                    const labelB = String(b[cfg.labelField] ?? "").trim();
+                    const idxA = labelOrder[labelA] !== undefined ? labelOrder[labelA] : 99999;
+                    const idxB = labelOrder[labelB] !== undefined ? labelOrder[labelB] : 99999;
+                    return idxA - idxB;
+                });
+            }
+            if (cfg.topN && cfg.topN > 0) source = source.slice(0, cfg.topN);
+
+            const labels = source.map(r => String(r[cfg.labelField] ?? ""));
+            const fields = cfg.valueFields || [];
+            const colors = CHART_PALETTE;
+            const vals = f => source.map(r => Number(r[f]) || 0);
+            const datasets = fields.map((vf, i) => ({
+                label: vf, data: vals(vf), backgroundColor: colors[i % colors.length] + "E6", // E6 = 90% opacity
+                borderColor: colors[i % colors.length], borderWidth: 0, fill: false, tension: .3, borderRadius: 4
+            }));
+
+            let type = "bar", data = { labels, datasets }, options = chartBaseOptions();
+            const t = cfg.type;
+
+            if (t === "barh") { type = "bar"; options.indexAxis = "y"; }
+            else if (t === "clusteredColumn") { type = "bar"; options.scales.x.stacked = false; options.scales.y.stacked = false; }
+            else if (t === "stackedColumn") { type = "bar"; options.scales.x.stacked = true; options.scales.y.stacked = true; }
+            else if (t === "stacked100Column") {
+                type = "bar"; options.scales.x.stacked = true; options.scales.y.stacked = true;
+                options.scales.y.max = 100; options.scales.y.ticks = { font: { size: 11 }, callback: v => v + "%" };
+                datasets.forEach(ds => { ds.data = source.map(r => { const total = fields.reduce((a, f) => a + (Number(r[f]) || 0), 0); return total ? ((Number(r[ds.label]) || 0) / total * 100) : 0; }); });
+            }
+            else if (t === "clusteredBar") { type = "bar"; options.indexAxis = "y"; options.scales.x.stacked = false; options.scales.y.stacked = false; }
+            else if (t === "stackedBar") { type = "bar"; options.indexAxis = "y"; options.scales.x.stacked = true; options.scales.y.stacked = true; }
+            else if (t === "line") { type = "line"; datasets.forEach(ds => { ds.backgroundColor = ds.borderColor; ds.fill = false; ds.borderWidth = 3; }); }
+            else if (t === "area") { type = "line"; datasets.forEach(ds => { ds.backgroundColor = ds.borderColor + "33"; ds.fill = true; ds.borderWidth = 3; }); }
+            else if (t === "stackedArea") { type = "line"; datasets.forEach(ds => { ds.backgroundColor = ds.borderColor + "33"; ds.fill = true; ds.borderWidth = 3; }); options.scales.y.stacked = true; }
+            else if (t === "combo") {
+                type = "bar";
+                if (datasets.length) {
+                    datasets.forEach((ds, i) => { if (i === datasets.length - 1) { ds.type = "line"; ds.backgroundColor = ds.borderColor; ds.fill = false; ds.borderWidth = 3; ds.borderRadius = 0;} });
+                }
+            }
+            else if (t === "pie" || t === "doughnut") {
+                type = t; const first = fields[0]; data = { labels, datasets: [{ label: first, data: vals(first), backgroundColor: source.map((_, i) => colors[i % colors.length]), borderColor: "#fff", borderWidth: 2 }] };
+                options = { responsive: true, maintainAspectRatio: false, plugins: { legend: getLegendConfig(true, 12) } };
+            }
+            else if (t === "treemap") {
+                type = "treemap";
+                const first = fields[0];
+                data = { datasets: [{ tree: source.map(r => Number(r[first]) || 0), key: "value", groups: [cfg.labelField], backgroundColor: (ctx) => colors[ctx.dataIndex % colors.length], labels: { display: true, formatter: ctx => ctx.raw?.g?.[0] ?? ctx.raw?.v ?? "" } }] };
+                options = { responsive: true, maintainAspectRatio: false, plugins: { legend: getLegendConfig(false) } };
+            }
+            else if (t === "sunburst") {
+                type = "doughnut";
+                const first = fields[0];
+                data = {
+                    labels, datasets: [{ label: first, data: vals(first), backgroundColor: source.map((_, i) => colors[i % colors.length]), borderColor: "#fff", borderWidth: 2, weight: 1 },
+                    { label: "Komposisi", data: vals(first).map(v => Math.sqrt(Math.abs(v))), backgroundColor: source.map((_, i) => colors[(i + 3) % colors.length] + "99"), borderColor: "#fff", borderWidth: 1, weight: .55 }]
+                };
+                options = { responsive: true, maintainAspectRatio: false, cutout: "28%", plugins: { legend: getLegendConfig(true, 11) } };
+            }
+            else if (t === "gauge" || t === "progress") {
+                const v = Number(source[0]?.[fields[0]]) || 0, target = Math.max(Number(source[1]?.[fields[0]]) || 100, 1), pct = Math.max(0, Math.min(100, v / target * 100));
+                type = "doughnut"; data = { labels: ["Tercapai", "Sisa"], datasets: [{ data: [pct, 100 - pct], backgroundColor: [colors[0], "#e2e8f0"], borderWidth: 0 }] };
+                options = { responsive: true, maintainAspectRatio: false, rotation: -90, circumference: 180, cutout: "75%", plugins: { legend: { display: false }, tooltip: { enabled: false } } };
+            }
+            else if (t === "kpi") {
+                type = "doughnut"; const v = Number(source[0]?.[fields[0]]) || 0;
+                data = { labels: [fields[0]], datasets: [{ data: [1], backgroundColor: [colors[0]], borderWidth: 0 }] };
+                options = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false }, title: { display: true, text: String(v.toLocaleString("id-ID")), font: { size: 36, weight: "800", family: 'Inter' }, padding: { top: 60, bottom: 20 }, color: '#0f172a' } } };
+            }
+            else if (t === "bullet") {
+                type = "bar"; const v = Number(source[0]?.[fields[0]]) || 0, target = Number(source[1]?.[fields[0]]) || 100;
+                data = { labels: [labels[0] || "KPI"], datasets: [{ label: "Target", data: [target], backgroundColor: "#e2e8f0", barThickness: 32, borderRadius: 4 }, { label: "Realisasi", data: [v], backgroundColor: colors[0], barThickness: 16, borderRadius: 4 }] };
+                options.indexAxis = "y"; options.plugins.legend.display = true;
+            }
+            else if (t === "radialBar") {
+                type = "doughnut"; data = { labels, datasets: [{ data: vals(fields[0]), backgroundColor: source.map((_, i) => colors[i % colors.length]), borderColor: "#fff", borderWidth: 3 }] };
+                options = { responsive: true, maintainAspectRatio: false, cutout: "50%", plugins: { legend: getLegendConfig(true, 11) } };
+            }
+            else if (t === "scatter") {
+                type = "scatter"; const xField = fields[0], yField = fields[1] || fields[0];
+                data = { datasets: [{ label: xField + " vs " + yField, data: source.map((r, i) => ({ x: Number(r[xField]) || 0, y: Number(r[yField]) || 0 })), backgroundColor: colors[0] }] };
+            }
+            else if (t === "bubble") {
+                type = "bubble"; const xField = fields[0], yField = fields[1] || fields[0], rField = fields[2] || fields[0];
+                data = { datasets: [{ label: xField + " / " + yField, data: source.map(r => ({ x: Number(r[xField]) || 0, y: Number(r[yField]) || 0, r: Math.max(4, Math.sqrt(Math.abs(Number(r[rField]) || 0)) / 4) })), backgroundColor: colors[0] + "99" }] };
+            }
+            else if (t === "histogram") {
+                type = "bar"; const raw = vals(fields[0]).filter(v => Number.isFinite(v)); const n = Math.min(10, Math.max(5, Math.ceil(Math.sqrt(raw.length || 1))));
+                const min = Math.min(...raw, 0), max = Math.max(...raw, 1), step = (max - min || 1) / n, bins = Array.from({ length: n }, (_, i) => ({ lo: min + i * step, hi: i === n - 1 ? max : min + (i + 1) * step, count: 0 }));
+                raw.forEach(v => { let i = Math.min(n - 1, Math.floor((v - min) / (max - min || 1) * n)); bins[i].count++; });
+                data = { labels: bins.map(b => `${b.lo.toLocaleString("id-ID", { maximumFractionDigits: 1 })}–${b.hi.toLocaleString("id-ID", { maximumFractionDigits: 1 })}`), datasets: [{ label: fields[0], data: bins.map(b => b.count), backgroundColor: colors[0] + "CC", borderRadius: 4 }] };
+            }
+            else if (t === "boxplot") {
+                type = "boxplot"; data = { labels: [fields[0]], datasets: [{ label: fields[0], data: [vals(fields[0])], backgroundColor: colors[0] + "55", borderColor: colors[0] }] };
+            }
+            else if (t === "waterfall") {
+                type = "bar"; const raw = vals(fields[0]); let cum = 0; const floating = raw.map(v => { const start = cum; cum += v; return [Math.min(start, cum), Math.max(start, cum)]; });
+                data = { labels, datasets: [{ label: fields[0], data: floating, backgroundColor: raw.map(v => v >= 0 ? colors[1] + "CC" : colors[4] + "CC"), borderColor: raw.map(v => v >= 0 ? colors[1] : colors[4]), borderWidth: 1, borderRadius: 4 }] };
+            }
+            else if (t === "funnel") {
+                type = "funnel"; const first = fields[0]; data = { labels, datasets: [{ label: first, data: vals(first), backgroundColor: source.map((_, i) => colors[i % colors.length]) }] };
+                options = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+            }
+            else if (t === "timeline" || t === "gantt") {
+                type = "bar"; options.indexAxis = "y";
+                const raw = source.map((r, i) => Number(r[fields[0]]) || 0);
+                data = { labels: labels.map((l, i) => l || ("Periode " + (i + 1))), datasets: [{ label: fields[0], data: raw.map((v, i) => [i, Math.max(i + 1, i + v)]), backgroundColor: colors[0] + "CC", borderRadius: 4 }] };
+                options.scales.x = { beginAtZero: true, ticks: { font: { size: 11 } } }; options.scales.y = { ticks: { font: { size: 11 } } };
+            }
+            else if (t === "heatmap" || t === "calendarHeatmap") {
+                type = "matrix"; const vf = fields[0], n = source.length;
+                const matrixData = source.map((r, i) => ({ x: i % 12, y: Math.floor(i / 12), v: Number(r[vf]) || 0 }));
+                data = { datasets: [{ label: vf, data: matrixData, backgroundColor: ctx => { const v = ctx.raw?.v || 0; const max = Math.max(...matrixData.map(d => d.v), 1); return colors[0] + Math.round(35 + 190 * v / max).toString(16).padStart(2, "0"); }, width: ({ chart }) => (chart.chartArea?.width || 300) / 12 - 3, height: ({ chart }) => (chart.chartArea?.height || 200) / Math.max(1, Math.ceil(n / 12)) - 3 }] };
+                options = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${labels[ctx.raw?.x] || ""}: ${ctx.raw?.v ?? 0}` } } }, scales: { x: { display: false }, y: { display: false } } };
+            }
+
+            options.plugins = options.plugins || {};
+            options.plugins.tooltip = options.plugins.tooltip || {};
+            options.plugins.tooltip.numberFormat = cfg.numberFormat || 'full';
+            options.plugins.tooltip.callbacks = options.plugins.tooltip.callbacks || {};
+            options.plugins.tooltip.callbacks.label = (context) => {
+                const label = context.label || context.dataset.label || '';
+                let val = context.raw;
+                if (typeof val === 'object' && val !== null) {
+                    val = val.y !== undefined ? val.y : val.v;
+                }
+                const formatted = formatChartValue(val, cfg.numberFormat || 'full');
+                return `${label}: ${formatted}`;
+            };
+
+            options.plugins.datalabels = {
+                display: cfg.showLabels !== false,
+                align: (context) => {
+                    const type = context.chart.config.type;
+                    return (type === 'pie' || type === 'doughnut') ? 'center' : (options.indexAxis === 'y' ? 'end' : 'top');
+                },
+                anchor: (context) => {
+                    const type = context.chart.config.type;
+                    return (type === 'pie' || type === 'doughnut') ? 'center' : 'end';
+                },
+                formatter: (value, context) => {
+                    if (value === null || value === undefined) return '';
+                    let val = value;
+                    if (typeof value === 'object') {
+                        val = value.y !== undefined ? value.y : value.v;
+                    }
+                    return formatChartValue(val, cfg.numberFormat || 'full');
+                },
+                font: { size: 10, weight: '600', family: 'Inter' },
+                color: (context) => {
+                    const type = context.chart.config.type;
+                    return (type === 'pie' || type === 'doughnut') ? '#fff' : '#475569';
+                },
+                backgroundColor: (context) => {
+                    const type = context.chart.config.type;
+                    return (type === 'pie' || type === 'doughnut') ? 'rgba(15,23,42,0.6)' : 'rgba(255,255,255,0.8)';
+                },
+                borderRadius: 4,
+                padding: 4
+            };
+            const tCfg = cfg.type;
+            if (["treemap", "boxplot", "funnel", "gantt", "timeline", "calendarHeatmap", "heatmap"].includes(tCfg)) {
+                options.plugins.datalabels = { display: false };
+            }
+
+            const isHorizontal = options.indexAxis === "y";
+            const valAxis = isHorizontal ? "x" : "y";
+            if (options.scales && options.scales[valAxis]) {
+                options.scales[valAxis].ticks = options.scales[valAxis].ticks || {};
+                options.scales[valAxis].ticks.font = options.scales[valAxis].ticks.font || { size: 11, family: 'Inter' };
+                if (cfg.type !== "stacked100Column") {
+                    options.scales[valAxis].ticks.callback = function(value) {
+                        return formatChartValue(value, cfg.numberFormat || 'full');
+                    };
+                }
+            }
+
+            try {
+                chartInstances[cfg.id] = new Chart(canvas.getContext("2d"), { type, data, options, plugins: [ChartDataLabels] });
+            } catch (err) {
+                console.error("Chart render error", t, err);
+                chartInstances[cfg.id] = new Chart(canvas.getContext("2d"), { type: "bar", data: { labels, datasets }, options: chartBaseOptions() });
+            }
+        }
+
+        function renderChartValueFieldGroups(selected) {
+            const wrap = document.getElementById("chartValueGroups");
+            wrap.innerHTML = GROUPS.map(g => {
+                const fields = FIELD_DEFS.filter(f => f.group === g && f.type === "number");
+                if (!fields.length) return "";
+                return `<div style="margin-bottom: 12px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: #f8fafc;">
+      <div style="font-size: 12px; font-weight: 700; color: var(--primary); margin-bottom: 8px;">${escapeHtml(g)}</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px;">
+        ${fields.map(f => `<label style="display:flex; align-items:center; gap:8px; font-size: 12px; cursor:pointer;">
+          <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);" data-chartvaluekey="${escapeAttr(f.key)}" ${selected.includes(f.key) ? "checked" : ""}>
+          ${escapeHtml(f.label)}
+        </label>`).join("")}
+      </div>
+    </div>`;
+            }).join("");
+        }
+        function populateChartLabelFieldSelect(selectedField) {
+            const sel = document.getElementById("chart_labelField");
+            let html = "";
+            GROUPS.forEach(g => {
+                const fields = FIELD_DEFS.filter(f => f.group === g);
+                if (!fields.length) return;
+                html += `<optgroup label="${escapeAttr(g)}">${fields.map(f => `<option value="${escapeAttr(f.key)}">${escapeHtml(f.label)}${f.type === "number" ? " (angka)" : ""}</option>`).join("")}</optgroup>`;
+            });
+            sel.innerHTML = html;
+            sel.value = selectedField || FIELD_DEFS[0]?.key || "";
+        }
+        function getUniqueChartLabelValues(field) {
+            const set = new Set();
+            filteredData.forEach(r => { set.add(String(r[field] ?? "")); });
+            return Array.from(set).sort((a, b) => a.localeCompare(b, "id", { numeric: true }));
+        }
+        function moveChartLabelValue(btn, direction) {
+            const item = btn.closest('.colpick-item');
+            if (!item) return;
+            const parent = item.parentElement;
+            if (direction === -1) {
+                const prev = item.previousElementSibling;
+                if (prev) parent.insertBefore(item, prev);
+            } else if (direction === 1) {
+                const next = item.nextElementSibling;
+                if (next) parent.insertBefore(next, item);
+            }
+        }
+
+        function renderChartLabelValueCheckboxes(field, selectedValues) {
+            const wrap = document.getElementById("chartLabelValues");
+            const values = getUniqueChartLabelValues(field);
+
+            if (selectedValues && selectedValues.length) {
+                const selSet = new Set(selectedValues.map(String));
+                const orderMap = new Map();
+                selectedValues.forEach((v, i) => orderMap.set(String(v), i));
+
+                values.sort((a, b) => {
+                    const strA = String(a), strB = String(b);
+                    const hasA = selSet.has(strA), hasB = selSet.has(strB);
+                    if (hasA && hasB) return orderMap.get(strA) - orderMap.get(strB);
+                    if (hasA) return -1;
+                    if (hasB) return 1;
+                    return strA.localeCompare(strB, "id", { numeric: true });
+                });
+            }
+
+            const allSelected = !selectedValues || !selectedValues.length;
+            const selectedSet = new Set((selectedValues || []).map(String));
+            if (!values.length) {
+                wrap.innerHTML = `<div style="font-size:12px;color:var(--muted)">Tidak ada data.</div>`;
+            } else {
+                wrap.innerHTML = values.map(v => `
+<div class="colpick-item" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px;border-radius:6px;border:1px solid var(--border);margin-bottom:6px;background:#fff">
+    <label style="flex:1;display:flex;align-items:center;gap:8px;margin:0;cursor:pointer;font-size:12px">
+        <input style="width:16px;height:16px;accent-color:var(--primary);" type="checkbox" data-chartlabelvalue="${escapeAttr(v)}" ${allSelected || selectedSet.has(v) ? "checked" : ""}>
+        <span>${escapeHtml(v === "" ? "(kosong)" : v)}</span>
+    </label>
+    <div style="display:flex;gap:4px">
+        <button type="button" class="btn gray" onclick="moveChartLabelValue(this, -1)" style="padding:2px 6px;font-size:10px;">▲</button>
+        <button type="button" class="btn gray" onclick="moveChartLabelValue(this, 1)" style="padding:2px 6px;font-size:10px;">▼</button>
+    </div>
+</div>`).join("");
+            }
+        }
+        function onChartLabelFieldChange() {
+            const field = document.getElementById("chart_labelField").value;
+            renderChartLabelValueCheckboxes(field, null);
+        }
+        function toggleAllChartLabelValues(state) {
+            document.querySelectorAll("#chartLabelValues input[data-chartlabelvalue]").forEach(el => { el.checked = state; });
+        }
+        function openChartModal(chartId) {
+            const existing = chartId ? charts.find(c => c.id === chartId) : null;
+            const cfg = existing || {
+                id: "c" + Date.now(), title: "", type: "bar", row: 1,
+                labelField: (FIELD_DEFS.find(f => f.type === "text") || FIELD_DEFS[0]).key,
+                valueFields: ["Target IDR"], labelValues: [], sortDesc: true,
+                topN: 0, showLabels: true, numberFormat: "full"
+            };
+            document.getElementById("chartModalTitle").textContent = existing ? "Edit Grafik Analitik" : "Tambah Grafik Analitik";
+            document.getElementById("chart_id").value = existing ? existing.id : "";
+            document.getElementById("chart_title").value = cfg.title || "";
+            document.getElementById("chart_type").value = cfg.type || "bar";
+            document.getElementById("chart_row").value = String(cfg.row || 1);
+
+            populateChartLabelFieldSelect(cfg.labelField);
+            renderChartLabelValueCheckboxes(document.getElementById("chart_labelField").value, cfg.labelValues || []);
+
+            renderChartValueFieldGroups(cfg.valueFields || []);
+            document.getElementById("chart_sort").checked = cfg.sortDesc !== false;
+            document.getElementById("chart_showLabels").checked = cfg.showLabels !== false;
+            document.getElementById("chart_numberFormat").value = cfg.numberFormat || "full";
+            document.getElementById("chart_topn").value = cfg.topN || 0;
+
+            document.getElementById("chartModal").dataset.newId = existing ? "" : cfg.id;
+            document.getElementById("chartModal").classList.remove("hidden");
+        }
+        function closeChartModal() { document.getElementById("chartModal").classList.add("hidden"); }
+        function saveChartModal() {
+            const existingId = document.getElementById("chart_id").value;
+            const newId = document.getElementById("chartModal").dataset.newId;
+            const id = existingId || newId;
+
+            const valueFields = Array.from(document.querySelectorAll("#chartValueGroups input[data-chartvaluekey]:checked"))
+                .map(el => el.dataset.chartvaluekey);
+            if (!valueFields.length) { showAlert("Pilih minimal 1 kolom nilai (sumbu Y) untuk grafik.", "error"); return; }
+
+            const allLabelCheckboxes = Array.from(document.querySelectorAll("#chartLabelValues input[data-chartlabelvalue]"));
+            const checkedLabelValues = allLabelCheckboxes.filter(el => el.checked).map(el => el.dataset.chartlabelvalue);
+            if (allLabelCheckboxes.length && !checkedLabelValues.length) { showAlert("Pilih minimal 1 isi kategori.", "error"); return; }
+            
+            const defaultOrderValues = getUniqueChartLabelValues(document.getElementById("chart_labelField").value);
+            const currentDOMValues = allLabelCheckboxes.map(el => el.dataset.chartlabelvalue);
+            const isReordered = currentDOMValues.some((v, idx) => String(v) !== String(defaultOrderValues[idx]));
+
+            const labelValues = (checkedLabelValues.length === allLabelCheckboxes.length && !isReordered) ? [] : checkedLabelValues;
+
+            const cfg = {
+                id,
+                title: document.getElementById("chart_title").value.trim() || "Grafik Tanpa Judul",
+                type: document.getElementById("chart_type").value,
+                row: Number(document.getElementById("chart_row").value) || 1,
+                labelField: document.getElementById("chart_labelField").value,
+                valueFields,
+                labelValues,
+                sortDesc: document.getElementById("chart_sort").checked,
+                showLabels: document.getElementById("chart_showLabels").checked,
+                numberFormat: document.getElementById("chart_numberFormat").value || "full",
+                topN: Number(document.getElementById("chart_topn").value) || 0
+            };
+
+            const idx = charts.findIndex(c => c.id === id);
+            if (idx >= 0) { charts[idx] = cfg; } else { charts.push(cfg); }
+            saveCharts();
+            closeChartModal();
+            renderCharts();
+            showAlert("Grafik berhasil disimpan.", "success");
+        }
+        function deleteChart(id) {
+            if (!confirm("Hapus grafik ini?")) return;
+            if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
+            charts = charts.filter(c => c.id !== id);
+            saveCharts();
+            renderCharts();
+        }
+        function initChartsDelegation() {
+            document.getElementById("chartsContainer").addEventListener("click", (e) => {
+                const btn = e.target.closest("button[data-chart-action]");
+                if (!btn) return;
+                const action = btn.dataset.chartAction;
+                const id = btn.dataset.chartId;
+                if (action === "edit") openChartModal(id);
+                else if (action === "delete") deleteChart(id);
+                else if (action === "toggle-labels") {
+                     const cfg = charts.find(c => c.id === id);
+                     if (cfg) {
+                         cfg.showLabels = cfg.showLabels === false;
+                         saveCharts(); renderCharts();
+                     }
+                }
+            });
+        }
+
+        // STATE PER PAKET
+        function lsKey(pk, suffix) { return `icms_multi_${pk.id}_${suffix}`; }
+        function loadSetLS(key, fallbackArr) {
+            try { const raw = localStorage.getItem(key); if (!raw) return new Set(fallbackArr); return new Set(JSON.parse(raw)); }
+            catch (e) { return new Set(fallbackArr); }
+        }
+        function loadObjLS(key) {
+            try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : {}; } catch (e) { return {}; }
+        }
+        function loadColumnOrderLS(key, defaultOrder) {
+            defaultOrder = defaultOrder || FIELD_DEFS.map(f => f.key);
+            try {
+                const raw = localStorage.getItem(key);
+                if (!raw) return defaultOrder.slice();
+                const saved = JSON.parse(raw);
+                const validKeys = new Set(defaultOrder);
+                const cleaned = saved.filter(k => validKeys.has(k));
+                defaultOrder.forEach(k => { if (!cleaned.includes(k)) cleaned.push(k); });
+                return cleaned;
+            } catch (e) { return defaultOrder.slice(); }
+        }
+        function loadRawArrayLS(key) {
+            try { const raw = localStorage.getItem(key); if (!raw) return null; const arr = JSON.parse(raw); return Array.isArray(arr) ? arr : null; }
+            catch (e) { return null; }
+        }
+        function isForeignPacket(pk) { return !!(pk.sourceSheet && pk.sourceSheet !== "summary"); }
+        function fieldDefsOf(pk) { return isForeignPacket(pk) ? (pk.fieldDefs || []) : FIELD_DEFS; }
+        function groupsOf(pk) { return isForeignPacket(pk) ? ["Semua Kolom"] : GROUPS; }
+
+        const PACKET_LIST_KEY = "icms_multi_packet_list_v1";
+        function loadPacketList() {
+            try {
+                const raw = localStorage.getItem(PACKET_LIST_KEY);
+                if (!raw) return defaultPacketConfigs();
+                const saved = JSON.parse(raw);
+                if (Array.isArray(saved) && saved.length) return saved;
+                return defaultPacketConfigs();
+            } catch (e) { return defaultPacketConfigs(); }
+        }
+        function savePacketList() {
+            localStorage.setItem(PACKET_LIST_KEY, JSON.stringify(packetConfigs.map(c => ({ id: c.id, icon: c.icon, title: c.title, groups: c.groups || [], source: c.source || "summary" }))));
+        }
+        function createPacketState(cfg) {
+            const pk = { cfg, id: cfg.id, currentPage: 1 };
+            pk.sourceSheet = cfg.source && cfg.source !== "summary" ? cfg.source : "summary";
+            if (isForeignPacket(pk)) {
+                pk.fieldDefs = []; pk.sourceRows = []; pk._sourceLoaded = false;
+                pk.columnOrder = loadRawArrayLS(lsKey(pk, "column_order")) || [];
+                const savedVisRaw = localStorage.getItem(lsKey(pk, "visible_cols"));
+                pk._hasSavedVisible = !!savedVisRaw;
+                try { pk.visibleCols = savedVisRaw ? new Set(JSON.parse(savedVisRaw)) : new Set(); }
+                catch (e) { pk.visibleCols = new Set(); }
+            } else {
+                const defaultCols = (cfg.groups && cfg.groups.length)
+                    ? FIELD_DEFS.filter(f => cfg.groups.includes(f.group)).map(f => f.key)
+                    : FIELD_DEFS.map(f => f.key);
+                pk.visibleCols = loadSetLS(lsKey(pk, "visible_cols"), defaultCols);
+                pk.columnOrder = loadColumnOrderLS(lsKey(pk, "column_order"));
+            }
+            pk.rowStyles = loadObjLS(lsKey(pk, "row_styles"));
+            pk.colStyles = loadObjLS(lsKey(pk, "col_styles"));
+            pk.colHeaderStyles = loadObjLS(lsKey(pk, "col_header_styles"));
+            const savedTitle = localStorage.getItem(lsKey(pk, "table_title"));
+            pk.tableTitle = (savedTitle && savedTitle.trim()) ? savedTitle : (cfg.icon + " " + cfg.title);
+            return pk;
+        }
+
+        let packetConfigs = loadPacketList();
+        let packets = packetConfigs.map(createPacketState);
+        function getPacket(id) { return packets.find(p => p.id === id); }
+
+        const PACKET_ORDER_KEY = "icms_multi_packet_order";
+        function loadPacketOrder() {
+            const defaultOrder = packetConfigs.map(c => c.id);
+            try {
+                const raw = localStorage.getItem(PACKET_ORDER_KEY);
+                if (!raw) return defaultOrder;
+                const saved = JSON.parse(raw);
+                const valid = saved.filter(id => defaultOrder.includes(id));
+                defaultOrder.forEach(id => { if (!valid.includes(id)) valid.push(id); });
+                return valid;
+            } catch (e) { return defaultOrder; }
+        }
+        function savePacketOrder() { localStorage.setItem(PACKET_ORDER_KEY, JSON.stringify(packetOrder)); }
+        let packetOrder = loadPacketOrder();
+        function savePacketVisibleCols(pk) { localStorage.setItem(lsKey(pk, "visible_cols"), JSON.stringify([...pk.visibleCols])); }
+        function savePacketRowStyles(pk) { localStorage.setItem(lsKey(pk, "row_styles"), JSON.stringify(pk.rowStyles)); }
+        function savePacketColStyles(pk) { localStorage.setItem(lsKey(pk, "col_styles"), JSON.stringify(pk.colStyles)); }
+        function savePacketColHeaderStyles(pk) { localStorage.setItem(lsKey(pk, "col_header_styles"), JSON.stringify(pk.colHeaderStyles)); }
+        function savePacketColumnOrder(pk) { localStorage.setItem(lsKey(pk, "column_order"), JSON.stringify(pk.columnOrder)); }
+        function savePacketTitle(pk) { localStorage.setItem(lsKey(pk, "table_title"), pk.tableTitle); }
+
+        let availableSheetsCache = null;
+        async function fetchAvailableSheets() {
+            if (availableSheetsCache) return availableSheetsCache;
+            try {
+                const result = await apiGet({ action: "tables" });
+                availableSheetsCache = Array.isArray(result.data) ? result.data : [];
+            } catch (e) { availableSheetsCache = []; }
+            return availableSheetsCache;
+        }
+        async function loadPacketSourceData(pk) {
+            if (!isForeignPacket(pk)) return;
+            try {
+                const result = await apiGet({ action: "list", sheet: pk.sourceSheet });
+                const rows = Array.isArray(result.data) ? result.data : [];
+                ensureLocalRowKeys(rows);
+                pk.sourceRows = rows;
+
+                const exclude = new Set(["id", "created_at", "updated_at", "password_hash", "__rowKey"]);
+                const seen = new Set();
+                const orderedKeys = [];
+                rows.forEach(r => Object.keys(r).forEach(k => { if (!exclude.has(k) && !seen.has(k)) { seen.add(k); orderedKeys.push(k); } }));
+                pk.fieldDefs = orderedKeys.map(k => {
+                    const withVal = rows.find(r => r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== "");
+                    const isNum = withVal !== undefined && /^-?[\d.,]+$/.test(String(withVal[k]).trim()) && !isNaN(Number(String(withVal[k]).replace(/,/g, "")));
+                    return { key: k, label: k, type: isNum ? "number" : "text", group: "Semua Kolom" };
+                });
+
+                const validKeys = new Set(pk.fieldDefs.map(f => f.key));
+                let order = (pk.columnOrder || []).filter(k => validKeys.has(k));
+                pk.fieldDefs.forEach(f => { if (!order.includes(f.key)) order.push(f.key); });
+                pk.columnOrder = order;
+                savePacketColumnOrder(pk);
+
+                if (!pk._hasSavedVisible) {
+                    pk.visibleCols = new Set(pk.fieldDefs.map(f => f.key));
+                } else {
+                    pk.visibleCols = new Set([...pk.visibleCols].filter(k => validKeys.has(k)));
+                }
+                savePacketVisibleCols(pk);
+                pk._hasSavedVisible = true;
+                pk._sourceLoaded = true;
+            } catch (err) {
+                showAlert(`Gagal memuat sheet "${pk.sourceSheet}"` , "error");
+                pk.sourceRows = pk.sourceRows || [];
+                pk.fieldDefs = pk.fieldDefs || [];
+                pk._sourceLoaded = true;
+            }
+        }
+        async function refreshPacketSource(pkId) {
+            const pk = typeof pkId === "string" ? getPacket(pkId) : pkId;
+            if (!pk || !isForeignPacket(pk)) return;
+            showAlert(`Memuat data sheet "${pk.sourceSheet}"...`, "info");
+            await loadPacketSourceData(pk);
+            buildTableHead(pk);
+            renderColumnPickerGroups(pk);
+            renderTable(pk);
+            showAlert(`Sheet "${pk.sourceSheet}" berhasil dimuat.`, "success");
+        }
+
+        function renderNewTableGroupsPicker() {
+            const wrap = document.getElementById("newTableGroups");
+            wrap.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px;">
+    ${GROUPS.map(g => `<label style="display:flex;align-items:center;gap:8px;font-size:12px;background:#f8fafc;padding:8px;border-radius:6px;border:1px solid var(--border);"><input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);" data-newtablegroup="${escapeAttr(g)}"> ${escapeHtml(g)}</label>`).join("")}
+  </div>`;
+        }
+        function toggleAllNewTableGroups(check) {
+            document.querySelectorAll('#newTableGroups input[data-newtablegroup]').forEach(cb => { cb.checked = check; });
+        }
+        function currentNewTableSource() {
+            const el = document.querySelector('input[name="newTableSource"]:checked');
+            return el ? el.value : "summary";
+        }
+        function onNewTableSourceChange() {
+            const mode = currentNewTableSource();
+            document.getElementById("newTableGroupsSection").classList.toggle("hidden", mode !== "summary");
+            document.getElementById("newTableSheetSection").classList.toggle("hidden", mode !== "sheet");
+            document.getElementById("newTableDuplicateSection").classList.toggle("hidden", mode !== "duplicate");
+        }
+        async function openAddTableModal() {
+            document.getElementById("newTable_title").value = "";
+            document.querySelectorAll('input[name="newTableSource"]').forEach(r => { r.checked = (r.value === "summary"); });
+            renderNewTableGroupsPicker();
+            onNewTableSourceChange();
+            document.getElementById("addTableModal").classList.remove("hidden");
+
+            const sheetSelect = document.getElementById("newTable_sheet");
+            sheetSelect.innerHTML = `<option value="">Memuat daftar sheet...</option>`;
+            const sheets = await fetchAvailableSheets();
+            const selectable = sheets.filter(s => s !== "summary" && s !== "users");
+            sheetSelect.innerHTML = selectable.length
+                ? selectable.map(s => `<option value="${escapeAttr(s)}">${escapeHtml(s)}</option>`).join("")
+                : `<option value="">Tidak ada sheet lain terdaftar di code.gs</option>`;
+
+            const dupSelect = document.getElementById("newTable_duplicateFrom");
+            dupSelect.innerHTML = packetOrder.map(id => getPacket(id)).filter(Boolean)
+                .map(p => `<option value="${escapeAttr(p.id)}">${escapeHtml(p.tableTitle)}</option>`).join("")
+                || `<option value="">Belum ada tabel untuk diduplikat</option>`;
+        }
+        function closeAddTableModal() { document.getElementById("addTableModal").classList.add("hidden"); }
+        function saveAddTableModal() {
+            const mode = currentNewTableSource();
+            const titleInput = document.getElementById("newTable_title").value.trim();
+
+            if (mode === "duplicate") {
+                const srcId = document.getElementById("newTable_duplicateFrom").value;
+                const src = getPacket(srcId);
+                if (!src) { showAlert("Pilih tabel sumber.", "error"); return; }
+                duplicatePacket(src, titleInput);
+                return;
+            }
+
+            if (mode === "sheet") {
+                const sheetName = document.getElementById("newTable_sheet").value;
+                if (!sheetName) { showAlert("Pilih sheet referensi.", "error"); return; }
+                const title = titleInput || sheetName;
+                const cfg = { id: "pk" + Date.now(), icon: "🗂️", title, groups: [], source: sheetName };
+                packetConfigs.push(cfg); savePacketList();
+                const pk = createPacketState(cfg); packets.push(pk); packetOrder.push(cfg.id); savePacketOrder();
+                closeAddTableModal(); renderAllPacketShells(); packets.forEach(p => renderTable(p));
+                return;
+            }
+
+            const title = titleInput || "Tabel Baru";
+            const groups = Array.from(document.querySelectorAll('#newTableGroups input[data-newtablegroup]:checked')).map(cb => cb.dataset.newtablegroup);
+            const cfg = { id: "pk" + Date.now(), icon: "📋", title, groups, source: "summary" };
+            packetConfigs.push(cfg); savePacketList();
+            const pk = createPacketState(cfg); packets.push(pk); packetOrder.push(cfg.id); savePacketOrder();
+            closeAddTableModal(); renderAllPacketShells(); packets.forEach(p => renderTable(p));
+        }
+        function duplicatePacket(src, titleInput) {
+            const cfg = { id: "pk" + Date.now(), icon: src.cfg.icon, title: titleInput || (src.cfg.title + " (Salinan)"), groups: (src.cfg.groups || []).slice(), source: src.sourceSheet || "summary" };
+            packetConfigs.push(cfg); savePacketList();
+            const pk = createPacketState(cfg);
+            pk.visibleCols = new Set(src.visibleCols);
+            pk.columnOrder = src.columnOrder.slice();
+            pk.colStyles = JSON.parse(JSON.stringify(src.colStyles || {}));
+            pk.colHeaderStyles = JSON.parse(JSON.stringify(src.colHeaderStyles || {}));
+            pk.rowStyles = JSON.parse(JSON.stringify(src.rowStyles || {}));
+            pk.tableTitle = titleInput || (src.tableTitle + " (Salinan)");
+            savePacketVisibleCols(pk); savePacketColumnOrder(pk); savePacketColStyles(pk); savePacketColHeaderStyles(pk); savePacketRowStyles(pk); savePacketTitle(pk);
+            if (isForeignPacket(pk)) { pk._hasSavedVisible = true; }
+            packets.push(pk); packetOrder.push(cfg.id); savePacketOrder();
+            closeAddTableModal(); renderAllPacketShells(); packets.forEach(p => renderTable(p));
+        }
+        function deletePacket(id) {
+            if (packets.length <= 1) { showAlert("Minimal harus ada 1 tabel.", "error"); return; }
+            const pk = getPacket(id);
+            if (!pk) return;
+            if (!confirm("Hapus tabel \"" + pk.tableTitle + "\"?")) return;
+            ["visible_cols", "row_styles", "col_styles", "col_header_styles", "column_order", "table_title"].forEach(suffix => {
+                localStorage.removeItem(lsKey(pk, suffix));
+            });
+            packets = packets.filter(p => p.id !== id);
+            packetConfigs = packetConfigs.filter(c => c.id !== id);
+            packetOrder = packetOrder.filter(pid => pid !== id);
+            savePacketList(); savePacketOrder();
+            renderAllPacketShells(); packets.forEach(p => renderTable(p));
+        }
+        function getOrderedFieldDefs(pk) {
+            return pk.columnOrder.map(k => fieldDefsOf(pk).find(f => f.key === k)).filter(Boolean);
+        }
+        function resetColumnOrder(pkId) {
+            const pk = getPacket(pkId);
+            if (!pk) return;
+            pk.columnOrder = fieldDefsOf(pk).map(f => f.key);
+            savePacketColumnOrder(pk);
+            buildTableHead(pk); renderTable(pk);
+        }
+        function reorderColumnsDrag(pkId, draggedKey, targetKey, placeAfter) {
+            const pk = getPacket(pkId);
+            if (!pk) return;
+            const order = pk.columnOrder.slice();
+            const from = order.indexOf(draggedKey);
+            if (from < 0) return;
+            order.splice(from, 1);
+            let to = order.indexOf(targetKey);
+            if (to < 0) { order.push(draggedKey); }
+            else { if (placeAfter) to += 1; order.splice(to, 0, draggedKey); }
+            pk.columnOrder = order;
+            savePacketColumnOrder(pk); buildTableHead(pk); renderTable(pk);
+        }
+
+        let columnOrderDragKey = null;
+        function openColumnOrderModal(pkId) {
+            const pk = getPacket(pkId);
+            if (!pk) return;
+            document.getElementById("columnOrder_packet").value = pkId;
+            document.getElementById("columnOrderModalTitle").textContent = "Atur Urutan Kolom";
+            document.getElementById("columnOrderSearch").value = "";
+            renderColumnOrderList();
+            document.getElementById("columnOrderModal").classList.remove("hidden");
+        }
+        function closeColumnOrderModal() { document.getElementById("columnOrderModal").classList.add("hidden"); }
+        function renderColumnOrderList() {
+            const pkId = document.getElementById("columnOrder_packet").value;
+            const pk = getPacket(pkId);
+            const wrap = document.getElementById("columnOrderList");
+            if (!pk || !wrap) return;
+            const query = (document.getElementById("columnOrderSearch").value || "").trim().toLowerCase();
+            const defs = getOrderedFieldDefs(pk);
+            wrap.innerHTML = defs.map((f, i) => {
+                const visible = pk.visibleCols.has(f.key);
+                const matches = !query || f.label.toLowerCase().includes(query) || (f.group || "").toLowerCase().includes(query);
+                return `<div class="colorder-item${visible ? "" : " col-hidden-item"}${matches ? "" : " hidden"}" draggable="true" data-key="${escapeAttr(f.key)}" style="display:flex; align-items:center; gap:12px;">
+      <span class="drag-handle" style="font-size:18px;">⠿</span>
+      <span style="font-size:12px; font-weight:700; width:24px; color:var(--muted);">${i + 1}.</span>
+      <div style="flex:1;">
+         <div style="font-size:13px; font-weight:600; color:var(--dark);">${escapeHtml(f.label)}</div>
+         <div style="font-size:11px; color:var(--muted);">${escapeHtml(f.group || "")}</div>
+      </div>
+      ${visible ? "" : '<span style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:4px; color:var(--muted);">Disembunyikan</span>'}
+      <div style="display:flex; gap:4px;">
+        <button type="button" class="btn gray" style="padding:4px 8px; font-size:10px;" ${i === 0 ? "disabled" : ""} onclick="moveColumnOrderItem('${escapeAttr(f.key)}',-1)">▲</button>
+        <button type="button" class="btn gray" style="padding:4px 8px; font-size:10px;" ${i === defs.length - 1 ? "disabled" : ""} onclick="moveColumnOrderItem('${escapeAttr(f.key)}',1)">▼</button>
+      </div>
+    </div>`;
+            }).join("") || `<div style="font-size:12px;color:var(--muted);padding:20px;text-align:center;">Tidak ada kolom yang cocok.</div>`;
+        }
+        function moveColumnOrderItem(key, delta) {
+            const pkId = document.getElementById("columnOrder_packet").value;
+            const pk = getPacket(pkId);
+            if (!pk) return;
+            const order = pk.columnOrder.slice();
+            const i = order.indexOf(key);
+            const j = i + delta;
+            if (i < 0 || j < 0 || j >= order.length) return;
+            [order[i], order[j]] = [order[j], order[i]];
+            pk.columnOrder = order;
+            savePacketColumnOrder(pk); buildTableHead(pk); renderTable(pk); renderColumnOrderList();
+        }
+        function resetColumnOrderFromModal() {
+            const pkId = document.getElementById("columnOrder_packet").value;
+            if (!pkId) return;
+            resetColumnOrder(pkId); renderColumnOrderList();
+        }
+        function initColumnOrderModalDelegation() {
+            const list = document.getElementById("columnOrderList");
+            if (!list) return;
+            list.addEventListener("dragstart", (e) => {
+                const item = e.target.closest(".colorder-item");
+                if (!item) return;
+                columnOrderDragKey = item.dataset.key;
+                item.style.opacity = '0.5';
+                if (e.dataTransfer) { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", item.dataset.key); }
+            });
+            list.addEventListener("dragend", () => {
+                list.querySelectorAll(".colorder-item").forEach(el => { el.style.opacity = ''; el.style.borderTop = ''; el.style.borderBottom = ''; });
+                columnOrderDragKey = null;
+            });
+            list.addEventListener("dragover", (e) => {
+                if (!columnOrderDragKey) return;
+                const item = e.target.closest(".colorder-item");
+                if (!item || item.dataset.key === columnOrderDragKey) return;
+                e.preventDefault();
+                if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
+                const rect = item.getBoundingClientRect();
+                const placeAfter = (e.clientY - rect.top) > rect.height / 2;
+                list.querySelectorAll(".colorder-item").forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
+                if (placeAfter) item.style.borderBottom = '2px solid var(--primary)';
+                else item.style.borderTop = '2px solid var(--primary)';
+            });
+            list.addEventListener("drop", (e) => {
+                if (!columnOrderDragKey) return;
+                const item = e.target.closest(".colorder-item");
+                if (!item) { columnOrderDragKey = null; return; }
+                e.preventDefault();
+                const targetKey = item.dataset.key;
+                const rect = item.getBoundingClientRect();
+                const placeAfter = (e.clientY - rect.top) > rect.height / 2;
+                list.querySelectorAll(".colorder-item").forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
+                if (targetKey && targetKey !== columnOrderDragKey) {
+                    const pkId = document.getElementById("columnOrder_packet").value;
+                    reorderColumnsDrag(pkId, columnOrderDragKey, targetKey, placeAfter);
+                    renderColumnOrderList();
+                }
+                columnOrderDragKey = null;
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initAuthUI();
+            buildForm();
+            charts = loadCharts();
+            scorecards = loadScorecards();
+            renderAllPacketShells();
+            loadData();
+            initPacketsContainerDelegation();
+            initChartsDelegation();
+            initScorecardsDelegation();
+            initColumnOrderModalDelegation();
+        });
+
+        function initPacketsContainerDelegation() {
+            const container = document.getElementById("packetsContainer");
+
+            container.addEventListener("click", (e) => {
+                const btn = e.target.closest("button[data-action]");
+                if (!btn) return;
+                const action = btn.dataset.action;
+                if (action === "moveUp") { movePacket(btn.dataset.packet, -1); return; }
+                if (action === "moveDown") { movePacket(btn.dataset.packet, 1); return; }
+                const pkId = btn.closest(".packet-card")?.dataset.packetId;
+                const rk = btn.dataset.rowkey;
+                const r = rowDataMap.get(rk);
+                if (action === "format") openFormat(pkId, rk);
+                else if (action === "edit") { if (r) openEdit(r); }
+                else if (action === "delete") { if (r) deleteOne(r.id, rk); }
+            });
+
+            let dragCtx = null;
+            container.addEventListener("dragstart", (e) => {
+                const th = e.target.closest("th[data-col]");
+                if (th) {
+                    const table = th.closest("table");
+                    const pkId = table && table.id.startsWith("dataTable_") ? table.id.slice("dataTable_".length) : null;
+                    if (pkId) {
+                        dragCtx = { type: "column", packetId: pkId, key: th.dataset.col };
+                        th.style.opacity = '0.4';
+                        if (e.dataTransfer) { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", th.dataset.col); }
+                        return;
+                    }
+                }
+                const card = e.target.closest(".packet-card");
+                if (!card) return;
+                dragCtx = { type: "packet", id: card.dataset.packetId };
+                card.style.opacity = '0.4';
+                if (e.dataTransfer) { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", card.dataset.packetId); }
+            });
+
+            container.addEventListener("dragend", () => {
+                container.querySelectorAll("th").forEach(el => { el.style.opacity = ''; el.style.borderLeft = ''; el.style.borderRight = ''; });
+                container.querySelectorAll(".packet-card").forEach(el => { el.style.opacity = ''; el.style.borderTop = ''; el.style.borderBottom = ''; });
+                dragCtx = null;
+            });
+
+            container.addEventListener("dragover", (e) => {
+                if (!dragCtx) return;
+                if (dragCtx.type === "column") {
+                    const th = e.target.closest("th[data-col]");
+                    if (!th) return;
+                    const table = th.closest("table");
+                    const pkId = table && table.id.startsWith("dataTable_") ? table.id.slice("dataTable_".length) : null;
+                    if (pkId !== dragCtx.packetId) return;
+                    e.preventDefault();
+                    if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
+                    
+                    container.querySelectorAll("th").forEach(el => { el.style.borderLeft = ''; el.style.borderRight = ''; });
+                    if (th.dataset.col !== dragCtx.key) {
+                        const rect = th.getBoundingClientRect();
+                        const placeAfter = (e.clientX - rect.left) > rect.width / 2;
+                        if (placeAfter) th.style.borderRight = '2px solid var(--primary)';
+                        else th.style.borderLeft = '2px solid var(--primary)';
+                    }
+                } else {
+                    const card = e.target.closest(".packet-card");
+                    if (!card) return;
+                    e.preventDefault();
+                    if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
+                    container.querySelectorAll(".packet-card").forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
+                    if (card.dataset.packetId !== dragCtx.id) {
+                        const rect = card.getBoundingClientRect();
+                        const placeAfter = (e.clientY - rect.top) > rect.height / 2;
+                        if (placeAfter) card.style.borderBottom = '2px solid var(--primary)';
+                        else card.style.borderTop = '2px solid var(--primary)';
+                    }
+                }
+            });
+
+            container.addEventListener("drop", (e) => {
+                if (!dragCtx) return;
+                if (dragCtx.type === "column") {
+                    const th = e.target.closest("th[data-col]");
+                    if (!th) { dragCtx = null; return; }
+                    const table = th.closest("table");
+                    const pkId = table && table.id.startsWith("dataTable_") ? table.id.slice("dataTable_".length) : null;
+                    if (pkId !== dragCtx.packetId) { dragCtx = null; return; }
+                    e.preventDefault();
+                    const targetKey = th.dataset.col;
+                    if (targetKey && targetKey !== dragCtx.key) {
+                        const rect = th.getBoundingClientRect();
+                        const placeAfter = (e.clientX - rect.left) > rect.width / 2;
+                        reorderColumnsDrag(dragCtx.packetId, dragCtx.key, targetKey, placeAfter);
+                    }
+                } else {
+                    const card = e.target.closest(".packet-card");
+                    if (!card) { dragCtx = null; return; }
+                    e.preventDefault();
+                    const targetId = card.dataset.packetId;
+                    if (targetId && targetId !== dragCtx.id) {
+                        const rect = card.getBoundingClientRect();
+                        const placeAfter = (e.clientY - rect.top) > rect.height / 2;
+                        reorderPacketsDrag(dragCtx.id, targetId, placeAfter);
+                    }
+                }
+                dragCtx = null;
+            });
+        }
+
+        // AUTH
+        function getSession() {
+            const raw = sessionStorage.getItem("icms_session");
+            if (!raw) return null;
+            try {
+                const s = JSON.parse(raw);
+                if (!s.token || !s.expires || new Date(s.expires).getTime() <= Date.now()) return null;
+                return s;
+            } catch (e) { return null; }
+        }
+        function currentToken() { const s = getSession(); return s ? s.token : ""; }
+        function initAuthUI() {
+            const s = getSession();
+            if (!s) { window.location.href = "login.html"; return; }
+            document.getElementById("whoami").textContent = s.username + " (" + s.role + ")";
+
+            const adminMenu = document.getElementById("adminEditPanel");
+            if (s.role === "admin") {
+                const el = document.getElementById("navUsers");
+                if (el) el.style.display = "";
+                if (adminMenu) adminMenu.style.display = "flex";
+                toggleAllEditPanels(true);
+            } else {
+                if (adminMenu) adminMenu.style.display = "none";
+                toggleAllEditPanels(false);
+            }
+        }
+        function handleAuthError(msg) {
+            if (/[Ss]esi/.test(msg || "")) {
+                sessionStorage.removeItem("icms_session");
+                window.location.href = "login.html";
+            }
+        }
+        async function logout() {
+            try { await apiPost({ action: "logout", token: currentToken() }); } catch (e) { }
+            sessionStorage.removeItem("icms_session");
+            window.location.href = "login.html";
+        }
+
+        function buildForm() {
+            const wrap = document.getElementById("formSections");
+            wrap.innerHTML = GROUPS.map(g => {
+                const fields = FIELD_DEFS.filter(f => f.group === g);
+                const isMonthGroup = g !== "Ringkasan Anggaran";
+                return `<div class="form-section">
+      <div class="form-section-title">${g}</div>
+      <div class="form-grid${isMonthGroup ? " months" : ""}">
+        ${fields.map(f => `<label class="${g === 'Ringkasan Anggaran' && f.key === 'Anggaran UNIT' ? 'full' : ''}">${f.label}
+          <input id="f_${cssKey(f.key)}" type="${f.type === 'number' ? 'number' : 'text'}" ${f.type === 'number' ? 'step="0.01"' : ''}>
+        </label>`).join("")}
+      </div>
+    </div>`;
+            }).join("");
+        }
+
+        function renderAllPacketShells() {
+            const container = document.getElementById("packetsContainer");
+            const orderedPackets = packetOrder.map(id => getPacket(id)).filter(Boolean);
+            container.innerHTML = orderedPackets.map((pk, idx) => `
+    <section class="packet-card" id="card_${pk.id}" data-packet-id="${pk.id}" draggable="true">
+      <div class="packet-header">
+        <div class="packet-title">
+          <span class="drag-handle" style="font-size:20px;" title="Seret untuk mengurutkan ulang">⠿</span>
+          <span style="font-size:20px;">${pk.cfg.icon}</span>
+          <span id="title_${pk.id}">${escapeHtml(pk.tableTitle)}</span>
+          ${isForeignPacket(pk) ? `<span style="font-size:11px;background:#e0f2fe;color:#0369a1;padding:4px 8px;border-radius:6px;">🗂️ Sheet: ${escapeHtml(pk.sourceSheet)}</span>` : ""}
+        </div>
+        <div class="packet-actions" style="display:flex; gap:8px; align-items:center;">
+          <div style="display:flex; gap:2px; margin-right:8px;">
+            <button type="button" class="btn gray" style="padding:4px 8px; font-size:10px;" data-action="moveUp" data-packet="${pk.id}" ${idx === 0 ? "disabled" : ""}>▲</button>
+            <button type="button" class="btn gray" style="padding:4px 8px; font-size:10px;" data-action="moveDown" data-packet="${pk.id}" ${idx === orderedPackets.length - 1 ? "disabled" : ""}>▼</button>
+          </div>
+          ${isForeignPacket(pk) ? `<button class="btn cyan" onclick="refreshPacketSource('${pk.id}')">🔄 Muat Ulang</button>` : ""}
+          <button class="btn gray" onclick="toggleColumnPanel('${pk.id}')">🧮 Kolom</button>
+          <button class="btn gray" onclick="openColumnOrderModal('${pk.id}')">↕️ Urutan</button>
+          <button class="btn gray" onclick="toggleColorPanel('${pk.id}')">🎨 Warna</button>
+          <button class="btn gray" onclick="openHeaderEditModal('${pk.id}')">✏️ Header</button>
+          <button class="btn red" onclick="deletePacket('${pk.id}')">🗑️ Hapus</button>
+        </div>
+      </div>
+      <div class="packet-body">
+        <section id="columnPanel_${pk.id}" class="form-section hidden" style="margin-bottom:20px;">
+          <div style="display:flex; gap:8px; margin-bottom:12px; align-items:center;">
+            <button class="btn gray" style="padding:4px 10px; font-size:12px;" onclick="toggleAllColumns('${pk.id}', true)">Tampilkan Semua</button>
+            <button class="btn gray" style="padding:4px 10px; font-size:12px;" onclick="toggleAllColumns('${pk.id}', false)">Sembunyikan Semua</button>
+            <button class="btn gray" style="padding:4px 10px; font-size:12px;" onclick="resetColumnOrder('${pk.id}')">Reset Urutan</button>
+            <span style="font-size:12px; color:var(--muted); margin-left:auto;" id="colpanelCount_${pk.id}"></span>
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:16px;" id="colpickGroups_${pk.id}"></div>
+        </section>
+
+        <section id="colorPanel_${pk.id}" class="form-section hidden" style="margin-bottom:20px;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:16px;" id="colorpickGroups_${pk.id}"></div>
+        </section>
+
+        <div class="table-wrap">
+          <table id="dataTable_${pk.id}">
+            <thead><tr id="theadRow_${pk.id}"></tr></thead>
+            <tbody id="tbody_${pk.id}"></tbody>
+          </table>
+        </div>
+
+        <div class="pager">
+          <div id="pageInfo_${pk.id}" style="font-weight:500;"></div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn gray" style="padding:6px 12px; font-size:12px;" id="prevBtn_${pk.id}" onclick="changePage('${pk.id}',-1)">← Sebelumnya</button>
+            <button class="btn gray" style="padding:6px 12px; font-size:12px;" id="nextBtn_${pk.id}" onclick="changePage('${pk.id}',1)">Selanjutnya →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  `).join("");
+
+            orderedPackets.forEach(pk => {
+                buildTableHead(pk);
+                renderColumnPickerGroups(pk);
+                renderColorPickerGroups(pk);
+                if (isForeignPacket(pk) && !pk._sourceLoaded) {
+                    refreshPacketSource(pk);
+                }
+            });
+        }
+
+        function movePacket(pkId, delta) {
+            const i = packetOrder.indexOf(pkId);
+            if (i < 0) return;
+            const j = i + delta;
+            if (j < 0 || j >= packetOrder.length) return;
+            [packetOrder[i], packetOrder[j]] = [packetOrder[j], packetOrder[i]];
+            savePacketOrder();
+            renderAllPacketShells();
+            packets.forEach(pk => renderTable(pk));
+        }
+        function reorderPacketsDrag(draggedId, targetId, placeAfter) {
+            if (draggedId === targetId) return;
+            const from = packetOrder.indexOf(draggedId);
+            if (from < 0) return;
+            packetOrder.splice(from, 1);
+            let to = packetOrder.indexOf(targetId);
+            if (to < 0) { packetOrder.push(draggedId); }
+            else { if (placeAfter) to += 1; packetOrder.splice(to, 0, draggedId); }
+            savePacketOrder();
+            renderAllPacketShells();
+            packets.forEach(pk => renderTable(pk));
+        }
+
+        async function apiGet(params = {}) {
+            const q = new URLSearchParams({ key: API_KEY, sheet: SHEET_NAME, token: currentToken(), ...params });
+            const res = await fetch(API_URL + "?" + q.toString(), { method: "GET" });
+            const text = await res.text();
+            let json;
+            try { json = JSON.parse(text) } catch (e) { throw new Error("Respons API bukan JSON") }
+            if (!json.ok) { handleAuthError(json.msg); throw new Error(json.msg || "API error"); }
+            return json;
+        }
+        async function apiPost(payload) {
+            const body = new URLSearchParams({ key: API_KEY, sheet: SHEET_NAME, token: currentToken(), ...payload });
+            const res = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+                body
+            });
+            const text = await res.text();
+            let json;
+            try { json = JSON.parse(text) } catch (e) { throw new Error("Respons API bukan JSON") }
+            if (!json.ok) { handleAuthError(json.msg); throw new Error(json.msg || "API error"); }
+            return json;
+        }
+
+        async function loadData() {
+            showAlert("Memuat data aplikasi...", "info");
+            try {
+                const result = await apiGet({ action: "list" });
+                allData = Array.isArray(result.data) ? result.data : [];
+                ensureLocalRowKeys(allData);
+                buildFilters();
+                applyFilters();
+                showAlert(`Data berhasil dimuat.`, "success");
+            } catch (err) {
+                showAlert("Gagal memuat data: " + err.message, "error");
+            }
+        }
+        function ensureLocalRowKeys(list) {
+            list.forEach((r, i) => {
+                const hasRealId = r.id !== undefined && r.id !== null && String(r.id).trim() !== "";
+                r.__rowKey = hasRealId ? String(r.id) : ("local_" + i);
+            });
+        }
+
+        function buildFilters() {
+            buildSelect("filterUnit", unique("Anggaran UNIT"), "Semua Anggaran UNIT");
+        }
+        function unique(field) {
+            return [...new Set(allData.map(x => String(x[field] ?? "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "id"));
+        }
+        function buildSelect(id, values, first) {
+            const el = document.getElementById(id);
+            el.innerHTML = `<option value="">${first}</option>` + values.map(v => `<option>${escapeHtml(v)}</option>`).join("");
+        }
+
+        function applyFilters() {
+            const unit = document.getElementById("filterUnit").value;
+            const q = document.getElementById("searchInput").value.trim().toLowerCase();
+            filteredData = allData.filter(r => {
+                if (unit && r["Anggaran UNIT"] !== unit) return false;
+                if (q) {
+                    const hay = String(r["Anggaran UNIT"] ?? "").toLowerCase();
+                    if (!hay.includes(q)) return false;
+                }
+                return true;
+            });
+            packets.forEach(pk => { pk.currentPage = 1; });
+            render();
+        }
+        function resetFilters() {
+            document.getElementById("filterUnit").value = "";
+            document.getElementById("searchInput").value = "";
+            applyFilters();
+        }
+
+        function render() {
+            renderScorecards();
+            renderCharts();
+            packets.forEach(pk => renderTable(pk));
+        }
+
+        function defaultScorecards() {
+            return [
+                { id: "sc1", icon: "🏢", title: "Jumlah Unit", field: "__COUNT__", agg: "count", format: "number" },
+                { id: "sc2", icon: "🎯", title: "Total Target IDR", field: "Target IDR", agg: "sum", format: "money" },
+                { id: "sc3", icon: "✅", title: "Total Realisasi H-1", field: "Realisasi H-1", agg: "sum", format: "money" },
+                { id: "sc4", icon: "🔮", title: "Total Proyeksi Next Month", field: "Proyeksi Next Month", agg: "sum", format: "money" }
+            ];
+        }
+        let scorecards = [];
+        function loadScorecards() {
+            try {
+                const raw = localStorage.getItem(SCORECARDS_KEY);
+                if (!raw) return defaultScorecards();
+                const saved = JSON.parse(raw);
+                return (Array.isArray(saved) && saved.length) ? saved : defaultScorecards();
+            } catch (e) { return defaultScorecards(); }
+        }
+        function saveScorecards() { localStorage.setItem(SCORECARDS_KEY, JSON.stringify(scorecards)); }
+
+        function computeScorecardValue(cfg, metric) {
+            const field = metric ? metric.field : (cfg.field || '__COUNT__');
+            const agg = metric ? metric.agg : (cfg.agg || 'sum');
+            const metricRowFilter = metric ? metric.rowFilter : (cfg.rowFilter || []);
+            let rows = filteredData;
+            if (metricRowFilter && metricRowFilter.length > 0) {
+                const labelKey = FIELD_DEFS.length ? FIELD_DEFS[0].key : null;
+                if (labelKey) {
+                    const set = new Set(metricRowFilter);
+                    rows = filteredData.filter(r => set.has(String(r[labelKey] ?? "")));
+                }
+            }
+            if (field === "__COUNT__") return rows.length;
+            const values = rows.map(r => Number(r[field]) || 0);
+            if (!values.length) return 0;
+            switch (agg) {
+                case "avg": return values.reduce((a, b) => a + b, 0) / values.length;
+                case "min": return Math.min(...values);
+                case "max": return Math.max(...values);
+                case "count": return values.length;
+                case "sum": default: return values.reduce((a, b) => a + b, 0);
+            }
+        }
+        function formatScorecardValue(value, format) {
+            if (format === "money") return money(value);
+            if (format === "percent") return num(value, 2) + "%";
+            return num(value, 0);
+        }
+        function scorecardFieldLabel(field) {
+            if (field === "__COUNT__") return "Jumlah Baris";
+            const f = FIELD_DEFS.find(x => x.key === field);
+            return f ? f.label : field;
+        }
+        function scorecardAggLabel(cfg) {
+            if (cfg.field === "__COUNT__") return "";
+            return { sum: "Total", avg: "Rata-rata", min: "Minimum", max: "Maximum", count: "Jumlah Baris" }[cfg.agg] || "";
+        }
+
+        const SCORECARD_STYLE_DEFAULT = { bgColor: "#FFFFFF", textColor: "#0f172a", valueSize: 28, labelSize: 13, cardSize: "md" };
+        const SCORECARD_CARD_SIZE_MAP = {
+            sm: { minWidth: "140px", padding: "16px" },
+            md: { minWidth: "180px", padding: "20px" },
+            lg: { minWidth: "220px", padding: "24px" },
+            xl: { minWidth: "260px", padding: "28px" }
+        };
+        function getScorecardStyle(cfg) { return Object.assign({}, SCORECARD_STYLE_DEFAULT, cfg.style || {}); }
+
+        function renderScorecards() {
+            const container = document.getElementById("scorecardsContainer");
+            if (!scorecards.length) {
+                container.innerHTML = `<div style="border: 1.5px dashed var(--border); border-radius: var(--radius-lg); padding: 40px; text-align: center; color: var(--muted); background: #fff;">Belum ada scorecard. Klik "+ Tambah Scorecard".</div>`;
+                return;
+            }
+            container.innerHTML = `<section class="summary">${scorecards.map(cfg => {
+                const st = getScorecardStyle(cfg);
+                const sizeCfg = SCORECARD_CARD_SIZE_MAP[st.cardSize] || SCORECARD_CARD_SIZE_MAP.md;
+                const cardStyle = `background:${escapeAttr(st.bgColor)};min-width:${sizeCfg.minWidth};padding:${sizeCfg.padding}`;
+                const labelStyle = `color:${escapeAttr(st.textColor)};font-size:${Number(st.labelSize) || 13}px`;
+                const valueStyle = `color:${escapeAttr(st.textColor)};font-size:${Number(st.valueSize) || 28}px;font-weight:800`;
+                const metrics = (cfg.metrics && cfg.metrics.length) ? cfg.metrics : [{ field: cfg.field || '__COUNT__', agg: cfg.agg || 'sum', format: cfg.format || 'number', label: '' }];
+                const metricsHtml = metrics.map(m => {
+                    const val = computeScorecardValue(cfg, m);
+                    const lbl = m.label || scorecardFieldLabel(m.field);
+                    const aggLbl = (m.field === '__COUNT__') ? '' : ({ sum: 'Total', avg: 'Rata-rata', min: 'Min', max: 'Max', count: 'Count' }[m.agg] || '');
+                    return `<div style="margin-top:${metrics.length > 1 ? '12' : '0'}px">
+                      <div style="${labelStyle};opacity:0.8;">${escapeHtml(lbl)}${aggLbl ? ` <span style="opacity:.6;font-size:11px">(${escapeHtml(aggLbl)})</span>` : ''}</div>
+                      <div style="${valueStyle};margin-top:4px;">${formatScorecardValue(val, m.format)}</div>
+                    </div>`;
+                }).join('<hr style="border-top:1px solid rgba(0,0,0,.05);margin:12px 0">');
+                return `<div class="card" style="${cardStyle}">
+      <div class="card-actions">
+        <button data-sc-action="edit" data-sc-id="${escapeAttr(cfg.id)}">✏️</button>
+        <button data-sc-action="delete" data-sc-id="${escapeAttr(cfg.id)}">🗑️</button>
+      </div>
+      <div style="${labelStyle};font-weight:700;margin-bottom:8px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">${escapeHtml(cfg.icon || "")}</span> 
+          <span>${escapeHtml(cfg.title)}</span>
+      </div>
+      ${metricsHtml}
+    </div>`;
+            }).join("")}</section>`;
+        }
+
+        function buildFieldSelectHtml(selectedKey) {
+            let html = `<option value="__COUNT__">🔢 Jumlah Baris</option>`;
+            GROUPS.forEach(g => {
+                const fields = FIELD_DEFS.filter(f => f.group === g && f.type === "number");
+                if (!fields.length) return;
+                html += `<optgroup label="${escapeAttr(g)}">${fields.map(f => `<option value="${escapeAttr(f.key)}" ${f.key === selectedKey ? 'selected' : ''}>${escapeHtml(f.label)}</option>`).join("")}</optgroup>`;
+            });
+            return html;
+        }
+        function buildAggSelectHtml(selectedAgg) {
+            return ['sum', 'avg', 'min', 'max', 'count'].map(v => {
+                const lbl = { sum: 'SUM', avg: 'AVG', min: 'MIN', max: 'MAX', count: 'COUNT' }[v];
+                return `<option value="${v}" ${v === selectedAgg ? 'selected' : ''}>${lbl}</option>`;
+            }).join('');
+        }
+        function buildFormatSelectHtml(selectedFmt) {
+            return [['money', 'Rupiah'], ['number', 'Angka'], ['percent', 'Persen']].map(([v, l]) =>
+                `<option value="${v}" ${v === selectedFmt ? 'selected' : ''}>${l}</option>`
+            ).join('');
+        }
+        function buildMetricRowFilterHtml(selectedFilter, midx) {
+            const labelField = FIELD_DEFS.find(f => f.type !== "number");
+            if (!labelField || !filteredData.length) return `<div style="font-size:11px;color:var(--muted)">Tidak ada data untuk filter.</div>`;
+            const allVals = [...new Set(filteredData.map(r => String(r[labelField.key] ?? "")))].sort();
+            const selected = new Set(selectedFilter && selectedFilter.length ? selectedFilter : allVals);
+            const chks = allVals.map(v => {
+                const esc = escapeHtml(v); const escV = v.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                const chk = selected.has(v) ? 'checked' : '';
+                return `<label style="display:flex;align-items:center;gap:6px;font-size:12px;padding:4px;border-radius:4px;background:#f8fafc;border:1px solid var(--border);"><input type="checkbox" style="width:14px;height:14px;accent-color:var(--primary);" class="sc-m-rowfilter-cb" value="${escV}" ${chk}> ${esc}</label>`;
+            }).join("");
+
+            const total = allVals.length;
+            const checkedCount = selected.size;
+            const hintTxt = (checkedCount === 0 || checkedCount === total) ? "Semua terpilih" : `${checkedCount} / ${total} terpilih`;
+
+            return `
+            <details style="flex-basis:100%;margin-top:8px; background:#fff; border:1px solid var(--border); border-radius:6px; padding:8px;">
+                <summary style="font-size:12px;cursor:pointer;color:var(--primary);font-weight:600; outline:none;">Filter Spesifik (<span class="sc-m-rf-hint">${hintTxt}</span>)</summary>
+                <div style="margin-top:12px;margin-bottom:8px; display:flex; gap:8px;">
+                    <button class="btn gray" style="padding:2px 8px; font-size:11px;" type="button" onclick="scMetricRowFilterSelectAll(this)">Pilih Semua</button>
+                    <button class="btn gray" style="padding:2px 8px; font-size:11px;" type="button" onclick="scMetricRowFilterClearAll(this)">Kosongkan</button>
+                </div>
+                <div class="sc-row-filter-list" onchange="updateScMetricRowFilterHint(this)" style="max-height:150px; overflow-y:auto; display:grid; grid-template-columns:1fr 1fr; gap:6px;">${chks}</div>
+            </details>`;
+        }
+        function scMetricRowFilterSelectAll(btn) {
+            const details = btn.closest('details');
+            details.querySelectorAll('.sc-m-rowfilter-cb').forEach(c => c.checked = true);
+            updateScMetricRowFilterHint(details.querySelector('.sc-row-filter-list'));
+        }
+        function scMetricRowFilterClearAll(btn) {
+            const details = btn.closest('details');
+            details.querySelectorAll('.sc-m-rowfilter-cb').forEach(c => c.checked = false);
+            updateScMetricRowFilterHint(details.querySelector('.sc-row-filter-list'));
+        }
+        function updateScMetricRowFilterHint(listEl) {
+            const cbs = listEl.querySelectorAll('.sc-m-rowfilter-cb');
+            const total = cbs.length;
+            const checked = [...cbs].filter(c => c.checked).length;
+            const hint = listEl.closest('details').querySelector('.sc-m-rf-hint');
+            if (hint) hint.textContent = (checked === 0 || checked === total) ? "Semua terpilih" : `${checked} / ${total} terpilih`;
+        }
+
+        function renderMetricRows(metrics) {
+            const list = document.getElementById('sc_metricList');
+            if (!list) return;
+            list.innerHTML = metrics.map((m, idx) => `
+                <div class="sc-metric-row" data-midx="${idx}" style="background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:12px; display:flex; flex-wrap:wrap; gap:8px;">
+                    <select class="sc-m-field" onchange="onMetricFieldChange(${idx})" style="flex:2; min-width:120px; border:1px solid var(--border); border-radius:6px; padding:8px; font-size:13px;">${buildFieldSelectHtml(m.field)}</select>
+                    <select class="sc-m-agg" style="flex:1; min-width:90px; border:1px solid var(--border); border-radius:6px; padding:8px; font-size:13px; display:${m.field === '__COUNT__' ? 'none' : ''}" data-midx="${idx}">${buildAggSelectHtml(m.agg)}</select>
+                    <select class="sc-m-fmt" style="flex:1; min-width:100px; border:1px solid var(--border); border-radius:6px; padding:8px; font-size:13px;">${buildFormatSelectHtml(m.format)}</select>
+                    <input type="text" class="sc-m-lbl" value="${escapeAttr(m.label || '')}" placeholder="Label custom" style="flex:2; min-width:120px; border:1px solid var(--border); border-radius:6px; padding:8px; font-size:13px;">
+                    <button type="button" class="btn red" style="padding:6px 12px; height:auto;" onclick="removeMetricRow(${idx})">🗑️</button>
+                    ${buildMetricRowFilterHtml(m.rowFilter, idx)}
+                </div>`).join('');
+        }
+        function addScorecardMetric() {
+            const rows = getMetricRowsFromUI();
+            rows.push({ field: '__COUNT__', agg: 'sum', format: 'number', label: '', rowFilter: [] });
+            renderMetricRows(rows);
+        }
+        function removeMetricRow(idx) {
+            let rows = getMetricRowsFromUI();
+            if (rows.length <= 1) { showAlert('Minimal 1 data harus ada.', "error"); return; }
+            rows.splice(idx, 1);
+            renderMetricRows(rows);
+        }
+        function onMetricFieldChange(idx) {
+            const row = document.querySelectorAll('#sc_metricList .sc-metric-row')[idx];
+            if (!row) return;
+            const field = row.querySelector('.sc-m-field').value;
+            const aggSel = row.querySelector('.sc-m-agg');
+            if (aggSel) aggSel.style.display = field === '__COUNT__' ? 'none' : '';
+        }
+        function getMetricRowsFromUI() {
+            const rows = [];
+            document.querySelectorAll('#sc_metricList .sc-metric-row').forEach(row => {
+                const cbs = [...row.querySelectorAll('.sc-m-rowfilter-cb')];
+                const total = cbs.length;
+                const checked = cbs.filter(c => c.checked);
+                let rowFilter = [];
+                if (checked.length > 0 && checked.length < total) {
+                    rowFilter = checked.map(c => c.value);
+                }
+                rows.push({
+                    field: row.querySelector('.sc-m-field').value,
+                    agg: row.querySelector('.sc-m-agg').value || 'sum',
+                    format: row.querySelector('.sc-m-fmt').value || 'number',
+                    label: row.querySelector('.sc-m-lbl').value.trim(),
+                    rowFilter: rowFilter
+                });
+            });
+            return rows;
+        }
+
+        function fillScorecardStyleFields(style) {
+            const st = Object.assign({}, SCORECARD_STYLE_DEFAULT, style || {});
+            setColorValue("sc_bgColor", "sc_bgColor_hex", st.bgColor);
+            setColorValue("sc_textColor", "sc_textColor_hex", st.textColor);
+            document.getElementById("sc_valueSize").value = st.valueSize;
+            document.getElementById("sc_labelSize").value = st.labelSize;
+            document.getElementById("sc_cardSize").value = st.cardSize;
+        }
+        function resetScorecardStyle() { fillScorecardStyleFields(SCORECARD_STYLE_DEFAULT); }
+        function openScorecardModal(scId) {
+            const existing = scId ? scorecards.find(c => c.id === scId) : null;
+            const cfg = existing || { id: "sc" + Date.now(), icon: "🔖", title: "", metrics: [{ field: '__COUNT__', agg: 'count', format: 'number', label: '' }], style: {}, rowFilter: [] };
+            if (!cfg.metrics) cfg.metrics = [{ field: cfg.field || '__COUNT__', agg: cfg.agg || 'sum', format: cfg.format || 'number', label: '' }];
+            document.getElementById("scorecardModalTitle").textContent = existing ? "Edit Scorecard" : "Tambah Scorecard";
+            document.getElementById("sc_id").value = existing ? existing.id : "";
+            document.getElementById("sc_icon").value = cfg.icon || "";
+            document.getElementById("sc_title").value = cfg.title || "";
+            renderMetricRows(cfg.metrics);
+            fillScorecardStyleFields(cfg.style);
+            document.getElementById("scorecardModal").dataset.newId = existing ? "" : cfg.id;
+            document.getElementById("scorecardModal").classList.remove("hidden");
+        }
+        function closeScorecardModal() { document.getElementById("scorecardModal").classList.add("hidden"); }
+        function saveScorecardModal() {
+            const existingId = document.getElementById("sc_id").value;
+            const newId = document.getElementById("scorecardModal").dataset.newId;
+            const id = existingId || newId;
+            const metrics = getMetricRowsFromUI();
+            if (!metrics.length) { showAlert('Tambahkan minimal 1 data.', "error"); return; }
+            const title = document.getElementById("sc_title").value.trim() || scorecardFieldLabel(metrics[0].field);
+
+            const style = {
+                bgColor: normalizeHex(document.getElementById("sc_bgColor").value, SCORECARD_STYLE_DEFAULT.bgColor),
+                textColor: normalizeHex(document.getElementById("sc_textColor").value, SCORECARD_STYLE_DEFAULT.textColor),
+                valueSize: Number(document.getElementById("sc_valueSize").value) || SCORECARD_STYLE_DEFAULT.valueSize,
+                labelSize: Number(document.getElementById("sc_labelSize").value) || SCORECARD_STYLE_DEFAULT.labelSize,
+                cardSize: document.getElementById("sc_cardSize").value || SCORECARD_STYLE_DEFAULT.cardSize
+            };
+
+            const cfg = {
+                id,
+                icon: document.getElementById("sc_icon").value.trim(),
+                title,
+                metrics,
+                field: metrics[0].field,
+                agg: metrics[0].agg,
+                format: metrics[0].format,
+                style
+            };
+            const idx = scorecards.findIndex(c => c.id === id);
+            if (idx >= 0) { scorecards[idx] = cfg; } else { scorecards.push(cfg); }
+            saveScorecards();
+            closeScorecardModal();
+            renderScorecards();
+        }
+        function deleteScorecard(id) {
+            if (!confirm("Hapus scorecard ini?")) return;
+            scorecards = scorecards.filter(c => c.id !== id);
+            saveScorecards();
+            renderScorecards();
+        }
+        function initScorecardsDelegation() {
+            document.getElementById("scorecardsContainer").addEventListener("click", (e) => {
+                const btn = e.target.closest("button[data-sc-action]");
+                if (!btn) return;
+                const action = btn.dataset.scAction;
+                const id = btn.dataset.scId;
+                if (action === "edit") openScorecardModal(id);
+                else if (action === "delete") deleteScorecard(id);
+            });
+        }
+
+        let _editPanelsVisible = true;
+        function toggleAllEditPanels(force) {
+            if (typeof force === "boolean") _editPanelsVisible = force;
+            else _editPanelsVisible = !_editPanelsVisible;
+
+            const btn = document.getElementById("globalEditToggleBtn");
+            const editSelectors = [
+                ".card-actions",
+                ".packet-actions",
+                ".chart-card-actions",
+                "button.icon-btn",
+                "button.edit",
+                "button.delete",
+                "button.format",
+                "[data-sc-action]",
+                ".edit-controlled-feature-btn"
+            ];
+            editSelectors.forEach(sel => {
+                document.querySelectorAll(sel).forEach(el => {
+                    el.style.display = _editPanelsVisible ? "" : "none";
+                });
+            });
+            if (btn) {
+                btn.textContent = _editPanelsVisible ? "👁️ Sembunyikan Mode Edit" : "✏️ Mode Edit (Aktifkan)";
+                btn.classList.toggle("active", _editPanelsVisible);
+            }
+        }
+
+        function buildTableHead(pk) {
+            const tr = document.getElementById("theadRow_" + pk.id);
+            let html = `<th class="sticky-col no-col" style="width:50px;min-width:50px;max-width:50px;text-align:center;">No</th>`;
+            getOrderedFieldDefs(pk).forEach(f => {
+                const hidden = pk.visibleCols.has(f.key) ? "" : " col-hidden";
+                const cs = pk.colStyles[f.key] || {};
+                const hs = pk.colHeaderStyles[f.key] || {};
+                const parts = [];
+                if (cs.width) parts.push(`width:${cs.width}px;min-width:${cs.width}px;max-width:${cs.width}px;overflow:hidden;text-overflow:ellipsis`);
+                if (cs.wrap) parts.push(`white-space:normal;word-break:break-word`);
+                if (hs.bg) parts.push(`background:${hs.bg}`);
+                if (hs.color) parts.push(`color:${hs.color}`);
+                if (hs.size) parts.push(`font-size:${hs.size}px`);
+                if (hs.bold) parts.push(`font-weight:700`);
+                const styleAttr = parts.length ? ` style="${escapeAttr(parts.join(";"))}"` : "";
+                const label = hs.label || f.label;
+                html += `<th data-col="${escapeAttr(f.key)}" class="${hidden.trim()}" draggable="true" title="Drag kolom untuk menyusun ulang"${styleAttr}>${escapeHtml(label)}</th>`;
+            });
+            html += `<th class="sticky-col action-col" style="width:100px;min-width:100px;max-width:100px;text-align:center;">Aksi</th>`;
+            tr.innerHTML = html;
+        }
+
+        function renderTable(pk) {
+            const foreign = isForeignPacket(pk);
+            const sourceData = foreign ? (pk.sourceRows || []) : filteredData;
+            const start = (pk.currentPage - 1) * PAGE_SIZE, end = Math.min(start + PAGE_SIZE, sourceData.length);
+            const rows = sourceData.slice(start, end);
+            const tbody = document.getElementById("tbody_" + pk.id);
+            const colCount = fieldDefsOf(pk).length + 2;
+            const emptyMsg = foreign ? `Belum ada data di sheet "${escapeHtml(pk.sourceSheet)}".` : "Tidak ada data.";
+            
+            tbody.innerHTML = rows.length ? rows.map((r, i) => {
+                const rk = r.__rowKey || String(r.id ?? ("local_" + (start + i)));
+                const st = pk.rowStyles[rk] || {};
+                const styleParts = [];
+                if (st.bg) styleParts.push(`background:${st.bg}`);
+                if (st.color) styleParts.push(`color:${st.color}`);
+                if (st.size) styleParts.push(`font-size:${st.size}px`);
+                if (st.bold) styleParts.push(`font-weight:700`);
+                if (st.height) styleParts.push(`height:${st.height}px`);
+                const styleAttr = styleParts.length ? ` style="${escapeAttr(styleParts.join(";"))}"` : "";
+                
+                const cells = getOrderedFieldDefs(pk).map(f => {
+                    const colSt = pk.colStyles[f.key] || {};
+                    let v = formatCellValue(r[f.key], f, colSt);
+                    const cls = ["td"];
+                    if (!foreign && f.key === "Anggaran UNIT") cls.push("left");
+                    if (!pk.visibleCols.has(f.key)) cls.push("col-hidden");
+                    const merged = {
+                        bg: st.bg !== undefined ? st.bg : colSt.bg,
+                        color: st.color !== undefined ? st.color : colSt.color,
+                        size: st.size !== undefined ? st.size : colSt.size,
+                        bold: st.bold !== undefined ? st.bold : colSt.bold,
+                        align: st.align !== undefined ? st.align : colSt.align,
+                        wrap: colSt.wrap
+                    };
+                    const cellParts = [];
+                    if (merged.bg) cellParts.push(`background:${merged.bg}`);
+                    if (merged.color) cellParts.push(`color:${merged.color}`);
+                    if (merged.size) cellParts.push(`font-size:${merged.size}px`);
+                    if (merged.bold) cellParts.push(`font-weight:700`);
+                    if (merged.align) cellParts.push(`text-align:${merged.align}`);
+                    if (merged.wrap) cellParts.push(`white-space:normal;word-break:break-word`);
+                    if (st.height) cellParts.push(`height:${st.height}px`);
+                    if (colSt.width) cellParts.push(`width:${colSt.width}px;min-width:${colSt.width}px;max-width:${colSt.width}px;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box`);
+                    const cellStyleAttr = cellParts.length ? ` style="${escapeAttr(cellParts.join(";"))}"` : "";
+                    return `<td data-col="${escapeAttr(f.key)}" class="${cls.join(" ")}"${cellStyleAttr}>${v}</td>`;
+                }).join("");
+                
+                return `<tr data-rowkey="${escapeAttr(rk)}"${styleAttr}>
+      <td class="sticky-col no-col" style="text-align:center;"${styleAttr}>${start + i + 1}</td>
+      ${cells}
+      <td class="sticky-col action-col" style="text-align:center;"${styleAttr}>
+        <div style="display:flex; justify-content:center; gap:4px;">
+            <button class="icon-btn format" style="background:#f1f5f9; color:var(--dark); border:1px solid var(--border);" title="Format baris" data-action="format" data-packet="${pk.id}" data-rowkey="${escapeAttr(rk)}">🎨</button>
+            ${foreign ? "" : `
+            <button class="icon-btn edit" style="background:#f1f5f9; color:var(--dark); border:1px solid var(--border);" data-action="edit" data-packet="${pk.id}" data-rowkey="${escapeAttr(rk)}">✏️</button>
+            <button class="icon-btn delete" style="background:#fee2e2; color:#b91c1c; border:1px solid #fecaca;" data-action="delete" data-packet="${pk.id}" data-rowkey="${escapeAttr(rk)}">🗑️</button>
+            `}
+        </div>
+      </td>
+    </tr>`;
+            }).join("") : `<tr><td colspan="${colCount}" style="padding:40px; text-align:center; color:var(--muted);">${emptyMsg}</td></tr>`;
+
+            rows.forEach((r, i) => {
+                const rk = r.__rowKey || String(r.id ?? ("local_" + (start + i)));
+                rowDataMap.set(rk, r);
+            });
+
+            const sourceLabel = foreign ? ` (Sheet: ${escapeHtml(pk.sourceSheet)})` : "";
+            document.getElementById("pageInfo_" + pk.id).textContent = `Menampilkan ${sourceData.length ? start + 1 : 0}–${end} dari ${sourceData.length.toLocaleString("id-ID")} entri${sourceLabel}`;
+            document.getElementById("prevBtn_" + pk.id).disabled = pk.currentPage <= 1;
+            document.getElementById("nextBtn_" + pk.id).disabled = end >= sourceData.length;
+        }
+        function changePage(pkId, delta) {
+            const pk = getPacket(pkId);
+            const len = isForeignPacket(pk) ? (pk.sourceRows || []).length : filteredData.length;
+            const max = Math.max(1, Math.ceil(len / PAGE_SIZE));
+            pk.currentPage = Math.min(max, Math.max(1, pk.currentPage + delta));
+            renderTable(pk);
+        }
+
+        function openFormat(pkId, id) {
+            const pk = getPacket(pkId);
+            document.getElementById("fmt_packet").value = pkId;
+            document.getElementById("fmt_type").value = "row";
+            document.getElementById("formatModalTitle").textContent = "Format Baris Spesifik";
+            fillFormatFields(pk.rowStyles[id] || {});
+            document.getElementById("fmt_width_section").classList.add("hidden");
+            document.getElementById("fmt_height_section").classList.remove("hidden");
+            document.getElementById("fmt_label_section").classList.add("hidden");
+            document.getElementById("fmt_align_section").classList.remove("hidden");
+            document.getElementById("fmt_wrap_section").classList.add("hidden");
+            document.getElementById("fmt_dataformat_section").classList.add("hidden");
+            document.getElementById("fmt_id").value = id;
+            document.getElementById("formatModal").classList.remove("hidden");
+        }
+        function openColumnFormat(pkId, key) {
+            const pk = getPacket(pkId);
+            const def = fieldDefsOf(pk).find(f => f.key === key);
+            document.getElementById("fmt_packet").value = pkId;
+            document.getElementById("fmt_type").value = "col";
+            document.getElementById("formatModalTitle").textContent = "Format Seluruh Kolom: " + (def ? def.label : key);
+            fillFormatFields(pk.colStyles[key] || {});
+            document.getElementById("fmt_width_section").classList.remove("hidden");
+            document.getElementById("fmt_height_section").classList.add("hidden");
+            document.getElementById("fmt_label_section").classList.add("hidden");
+            document.getElementById("fmt_align_section").classList.remove("hidden");
+            document.getElementById("fmt_wrap_section").classList.remove("hidden");
+            document.getElementById("fmt_dataformat_section").classList.remove("hidden");
+            document.getElementById("fmt_dataformat").value = (pk.colStyles[key] || {}).dataFormat || "";
+            document.getElementById("fmt_id").value = key;
+            document.getElementById("formatModal").classList.remove("hidden");
+        }
+        function openHeaderFormat(pkId, key) {
+            const pk = getPacket(pkId);
+            const def = fieldDefsOf(pk).find(f => f.key === key);
+            const hs = pk.colHeaderStyles[key] || {};
+            document.getElementById("fmt_packet").value = pkId;
+            document.getElementById("fmt_type").value = "header";
+            document.getElementById("formatModalTitle").textContent = "Format Header: " + (def ? def.label : key);
+            fillFormatFields(hs);
+            document.getElementById("fmt_width_section").classList.add("hidden");
+            document.getElementById("fmt_height_section").classList.add("hidden");
+            document.getElementById("fmt_label_section").classList.remove("hidden");
+            document.getElementById("fmt_align_section").classList.add("hidden");
+            document.getElementById("fmt_wrap_section").classList.add("hidden");
+            document.getElementById("fmt_dataformat_section").classList.add("hidden");
+            document.getElementById("fmt_label").value = hs.label || "";
+            document.getElementById("fmt_id").value = key;
+            document.getElementById("formatModal").classList.remove("hidden");
+        }
+        
+        function normalizeHex(v, fallback) {
+            v = String(v || "").trim().toUpperCase();
+            if (/^#[0-9A-F]{6}$/.test(v)) return v;
+            if (/^#[0-9A-F]{3}$/.test(v)) return "#" + v.slice(1).split("").map(x => x + x).join("");
+            if (/^[0-9A-F]{6}$/.test(v)) return "#" + v;
+            if (/^[0-9A-F]{3}$/.test(v)) return "#" + v.split("").map(x => x + x).join("");
+            return fallback;
+        }
+        function hexToRgb(hex) {
+            hex = normalizeHex(hex, "#000000");
+            return { r: parseInt(hex.slice(1, 3), 16), g: parseInt(hex.slice(3, 5), 16), b: parseInt(hex.slice(5, 7), 16) };
+        }
+        function rgbToHex(r, g, b) {
+            const clamp = x => Math.max(0, Math.min(255, Math.round(x)));
+            return "#" + [clamp(r), clamp(g), clamp(b)].map(x => x.toString(16).padStart(2, "0")).join("").toUpperCase();
+        }
+        function adjustColor(hex, amount) {
+            const { r, g, b } = hexToRgb(hex);
+            if (amount > 0) return rgbToHex(r + (255 - r) * amount, g + (255 - g) * amount, b + (255 - b) * amount);
+            const a = Math.abs(amount); return rgbToHex(r * (1 - a), g * (1 - a), b * (1 - a));
+        }
+        function syncColorHex(colorId, hexId) {
+            const c = document.getElementById(colorId), h = document.getElementById(hexId);
+            if (c && h) { h.value = c.value.toUpperCase(); renderColorRecommendations(colorId, hexId); }
+        }
+        function syncHexColor(hexId, colorId) {
+            const h = document.getElementById(hexId), c = document.getElementById(colorId);
+            if (!h || !c) return;
+            const v = normalizeHex(h.value, "");
+            if (v) { c.value = v; h.value = v; renderColorRecommendations(colorId, hexId); }
+        }
+        function setColorValue(colorId, hexId, value) {
+            const v = normalizeHex(value, "#FFFFFF");
+            const c = document.getElementById(colorId), h = document.getElementById(hexId);
+            if (c) c.value = v; if (h) h.value = v;
+            renderColorRecommendations(colorId, hexId);
+        }
+        function renderColorRecommendations(colorId, hexId) {
+            const c = document.getElementById(colorId), box = document.getElementById(colorId + "_recs");
+            if (!c || !box) return;
+            const base = normalizeHex(c.value, "#FFFFFF");
+            const dark = adjustColor(base, -0.2), dark2 = adjustColor(base, -0.4);
+            const bright = adjustColor(base, 0.2), bright2 = adjustColor(base, 0.4);
+            
+            box.innerHTML = [
+                ["-20%", dark], ["-40%", dark2], ["+20%", bright], ["+40%", bright2]
+            ].map(([label, v]) => `
+            <button type="button" onclick="setColorValue('${colorId}','${hexId}','${v}')" style="display:flex; align-items:center; gap:6px; padding:4px 8px; border:1px solid var(--border); border-radius:6px; background:#fff; cursor:pointer; font-size:11px;">
+                <span style="width:14px;height:14px;border-radius:4px;background:${v};border:1px solid rgba(0,0,0,0.1);"></span>
+                ${label}
+            </button>`).join("");
+        }
+
+        function fillFormatFields(s) {
+            const hasBg = s.bg !== undefined;
+            document.getElementById("fmt_use_bg").checked = hasBg;
+            document.getElementById("fmt_bg").value = normalizeHex(s.bg || "#ffffff", "#FFFFFF");
+            document.getElementById("fmt_bg_hex").value = document.getElementById("fmt_bg").value;
+            document.getElementById("fmt_bg").disabled = !hasBg;
+            document.getElementById("fmt_bg_hex").disabled = !hasBg;
+            renderColorRecommendations("fmt_bg", "fmt_bg_hex");
+
+            const hasColor = s.color !== undefined;
+            document.getElementById("fmt_use_color").checked = hasColor;
+            document.getElementById("fmt_color").value = normalizeHex(s.color || "#334155", "#334155");
+            document.getElementById("fmt_color_hex").value = document.getElementById("fmt_color").value;
+            document.getElementById("fmt_color").disabled = !hasColor;
+            document.getElementById("fmt_color_hex").disabled = !hasColor;
+            renderColorRecommendations("fmt_color", "fmt_color_hex");
+
+            const hasSize = s.size !== undefined;
+            document.getElementById("fmt_use_size").checked = hasSize;
+            document.getElementById("fmt_size").value = s.size || 13;
+            document.getElementById("fmt_size").disabled = !hasSize;
+
+            document.getElementById("fmt_bold").checked = !!s.bold;
+            document.getElementById("fmt_align").value = s.align || "";
+            document.getElementById("fmt_wrap").checked = !!s.wrap;
+
+            const hasWidth = s.width !== undefined;
+            document.getElementById("fmt_use_width").checked = hasWidth;
+            document.getElementById("fmt_width").value = s.width || 120;
+            document.getElementById("fmt_width").disabled = !hasWidth;
+
+            const hasHeight = s.height !== undefined;
+            document.getElementById("fmt_use_height").checked = hasHeight;
+            document.getElementById("fmt_height").value = s.height || 40;
+            document.getElementById("fmt_height").disabled = !hasHeight;
+        }
+        function closeFormatModal() { document.getElementById("formatModal").classList.add("hidden"); }
+        function toggleFmtField(checkboxId, fieldId) {
+            const disabled = !document.getElementById(checkboxId).checked;
+            document.getElementById(fieldId).disabled = disabled;
+            const hexId = fieldId === "fmt_bg" ? "fmt_bg_hex" : (fieldId === "fmt_color" ? "fmt_color_hex" : null);
+            if (hexId && document.getElementById(hexId)) document.getElementById(hexId).disabled = disabled;
+        }
+
+        function saveFormat() {
+            const pkId = document.getElementById("fmt_packet").value;
+            const pk = getPacket(pkId);
+            const type = document.getElementById("fmt_type").value;
+            const id = document.getElementById("fmt_id").value;
+            if (!pk || !id) return;
+
+            const style = {};
+            if (document.getElementById("fmt_use_bg").checked) style.bg = document.getElementById("fmt_bg").value;
+            if (document.getElementById("fmt_use_color").checked) style.color = document.getElementById("fmt_color").value;
+            if (document.getElementById("fmt_use_size").checked) style.size = Number(document.getElementById("fmt_size").value) || 13;
+            if (document.getElementById("fmt_bold").checked) style.bold = true;
+            if (type !== "header") {
+                const alignVal = document.getElementById("fmt_align").value;
+                if (alignVal) style.align = alignVal;
+            }
+
+            if (type === "col") {
+                if (document.getElementById("fmt_use_width").checked) style.width = Number(document.getElementById("fmt_width").value) || 120;
+                if (document.getElementById("fmt_wrap").checked) style.wrap = true;
+                const dataFormatVal = document.getElementById("fmt_dataformat").value;
+                if (dataFormatVal) style.dataFormat = dataFormatVal;
+                if (Object.keys(style).length) { pk.colStyles[id] = style; } else { delete pk.colStyles[id]; }
+                savePacketColStyles(pk);
+                buildTableHead(pk); renderColorPickerGroups(pk);
+            } else if (type === "header") {
+                const labelVal = document.getElementById("fmt_label").value.trim();
+                if (labelVal) style.label = labelVal;
+                if (Object.keys(style).length) { pk.colHeaderStyles[id] = style; } else { delete pk.colHeaderStyles[id]; }
+                savePacketColHeaderStyles(pk);
+                buildTableHead(pk); renderColorPickerGroups(pk);
+            } else {
+                if (document.getElementById("fmt_use_height").checked) style.height = Number(document.getElementById("fmt_height").value) || 40;
+                if (Object.keys(style).length) { pk.rowStyles[id] = style; } else { delete pk.rowStyles[id]; }
+                savePacketRowStyles(pk);
+            }
+            closeFormatModal();
+            renderTable(pk);
+        }
+        function resetFormat() {
+            const pkId = document.getElementById("fmt_packet").value;
+            const pk = getPacket(pkId);
+            const type = document.getElementById("fmt_type").value;
+            const id = document.getElementById("fmt_id").value;
+            if (pk && id) {
+                if (type === "col") {
+                    delete pk.colStyles[id]; savePacketColStyles(pk);
+                    buildTableHead(pk); renderColorPickerGroups(pk);
+                } else if (type === "header") {
+                    delete pk.colHeaderStyles[id]; savePacketColHeaderStyles(pk);
+                    buildTableHead(pk); renderColorPickerGroups(pk);
+                } else {
+                    delete pk.rowStyles[id]; savePacketRowStyles(pk);
+                }
+            }
+            closeFormatModal();
+            if (pk) renderTable(pk);
+        }
+
+        function toggleColorPanel(pkId) {
+            document.getElementById("colorPanel_" + pkId).classList.toggle("hidden");
+        }
+        function renderColorPickerGroups(pk) {
+            const wrap = document.getElementById("colorpickGroups_" + pk.id);
+            wrap.innerHTML = groupsOf(pk).map(g => {
+                const fields = fieldDefsOf(pk).filter(f => f.group === g);
+                return `<div style="border: 1px solid var(--border); border-radius: 6px; padding: 12px; background: #fff;">
+      <div style="font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 12px;">${escapeHtml(g)}</div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        ${fields.map(f => {
+                    const customCell = !!pk.colStyles[f.key];
+                    const customHeader = !!pk.colHeaderStyles[f.key];
+                    const displayLabel = (pk.colHeaderStyles[f.key] && pk.colHeaderStyles[f.key].label) || f.label;
+                    return `<div style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; padding:6px 10px; border-radius:6px; border:1px solid var(--border);">
+            <span style="font-size:12px; font-weight:500;">
+                ${customCell ? "🟢" : ""}${customHeader ? "🔵" : ""} ${escapeHtml(displayLabel)}
+            </span>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn gray" style="padding:2px 6px; font-size:10px;" title="Format Sel" onclick="openColumnFormat('${pk.id}','${escapeAttr(f.key)}')">🎨 Sel</button>
+              <button type="button" class="btn gray" style="padding:2px 6px; font-size:10px;" title="Format Header" onclick="openHeaderFormat('${pk.id}','${escapeAttr(f.key)}')">📝 Header</button>
+            </div>
+          </div>`;
+                }).join("")}
+      </div>
+    </div>`;
+            }).join("");
+        }
+
+        function openHeaderEditModal(pkId) {
+            const pk = getPacket(pkId);
+            document.getElementById("headerEdit_packet").value = pkId;
+            document.getElementById("tableTitleInput").value = pk.tableTitle || "";
+            renderHeaderEditGroups(pk);
+            document.getElementById("headerEditModal").classList.remove("hidden");
+        }
+        function closeHeaderEditModal() { document.getElementById("headerEditModal").classList.add("hidden"); }
+        function renderHeaderEditGroups(pk) {
+            const wrap = document.getElementById("headerEditGroups");
+            wrap.innerHTML = groupsOf(pk).map(g => {
+                const fields = fieldDefsOf(pk).filter(f => f.group === g);
+                return `<div style="margin-bottom: 16px; border: 1px solid var(--border); padding: 16px; border-radius: 6px; background:#f8fafc;">
+      <div style="font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 12px;">${escapeHtml(g)}</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${fields.map(f => {
+                    const hs = pk.colHeaderStyles[f.key] || {};
+                    const cs = pk.colStyles[f.key] || {};
+                    return `<div style="display:flex; align-items:center; gap:12px;">
+            <span style="min-width:180px;font-size:12px;font-weight:500;color:var(--text)" title="${escapeAttr(f.key)}">${escapeHtml(f.label)}</span>
+            <input type="text" data-headerkey="${escapeAttr(f.key)}" value="${escapeAttr(hs.label || "")}" placeholder="Alias untuk ${escapeAttr(f.label)}" style="flex:1;border:1px solid var(--border);border-radius:6px;padding:8px;font-size:12px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text);">
+              <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);" data-wrapkey="${escapeAttr(f.key)}" ${cs.wrap ? "checked" : ""}> Wrap Text
+            </label>
+          </div>`;
+                }).join("")}
+      </div>
+    </div>`;
+            }).join("");
+        }
+        function saveHeaderEdits() {
+            const pkId = document.getElementById("headerEdit_packet").value;
+            const pk = getPacket(pkId);
+            if (!pk) return;
+            pk.tableTitle = document.getElementById("tableTitleInput").value.trim() || (pk.cfg.icon + " " + pk.cfg.title);
+            savePacketTitle(pk);
+            document.getElementById("title_" + pk.id).textContent = pk.tableTitle;
+
+            document.querySelectorAll("#headerEditGroups input[data-headerkey]").forEach(inp => {
+                const key = inp.dataset.headerkey;
+                const val = inp.value.trim();
+                const hs = { ...(pk.colHeaderStyles[key] || {}) };
+                if (val) { hs.label = val; } else { delete hs.label; }
+                if (Object.keys(hs).length) { pk.colHeaderStyles[key] = hs; } else { delete pk.colHeaderStyles[key]; }
+            });
+            document.querySelectorAll("#headerEditGroups input[data-wrapkey]").forEach(chk => {
+                const key = chk.dataset.wrapkey;
+                const cs = { ...(pk.colStyles[key] || {}) };
+                if (chk.checked) { cs.wrap = true; } else { delete cs.wrap; }
+                if (Object.keys(cs).length) { pk.colStyles[key] = cs; } else { delete pk.colStyles[key]; }
+            });
+            savePacketColHeaderStyles(pk);
+            savePacketColStyles(pk);
+            buildTableHead(pk);
+            renderColorPickerGroups(pk);
+            closeHeaderEditModal();
+            renderTable(pk);
+            showAlert("Header kolom & judul tabel berhasil disimpan.", "success");
+        }
+        function resetAllHeaderEdits() {
+            const pkId = document.getElementById("headerEdit_packet").value;
+            const pk = getPacket(pkId);
+            if (!pk) return;
+            if (!confirm("Reset semua header & wrap text ke default?")) return;
+            Object.keys(pk.colHeaderStyles).forEach(key => {
+                delete pk.colHeaderStyles[key].label;
+                if (!Object.keys(pk.colHeaderStyles[key]).length) delete pk.colHeaderStyles[key];
+            });
+            Object.keys(pk.colStyles).forEach(key => {
+                delete pk.colStyles[key].wrap;
+                if (!Object.keys(pk.colStyles[key]).length) delete pk.colStyles[key];
+            });
+            savePacketColHeaderStyles(pk); savePacketColStyles(pk);
+            pk.tableTitle = pk.cfg.icon + " " + pk.cfg.title;
+            savePacketTitle(pk);
+            document.getElementById("title_" + pk.id).textContent = pk.tableTitle;
+            renderHeaderEditGroups(pk);
+            document.getElementById("tableTitleInput").value = pk.tableTitle;
+            buildTableHead(pk); renderColorPickerGroups(pk); renderTable(pk);
+        }
+
+        function toggleColumnPanel(pkId) {
+            document.getElementById("columnPanel_" + pkId).classList.toggle("hidden");
+        }
+        function renderColumnPickerGroups(pk) {
+            const wrap = document.getElementById("colpickGroups_" + pk.id);
+            wrap.innerHTML = groupsOf(pk).map(g => {
+                const fields = fieldDefsOf(pk).filter(f => f.group === g);
+                return `<div style="border: 1px solid var(--border); border-radius: 6px; padding: 12px; background: #fff;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span style="font-size:13px; font-weight:700; color:var(--primary);">${escapeHtml(g)}</span>
+        <div style="display:flex; gap:4px;">
+          <button type="button" class="btn gray" style="padding:2px 8px; font-size:10px;" onclick="toggleGroupColumns('${pk.id}','${escapeAttr(g)}', true)">Semua</button>
+          <button type="button" class="btn gray" style="padding:2px 8px; font-size:10px;" onclick="toggleGroupColumns('${pk.id}','${escapeAttr(g)}', false)">Kosongkan</button>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        ${fields.map(f => `<label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
+          <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);" data-colkey="${escapeAttr(f.key)}" ${pk.visibleCols.has(f.key) ? "checked" : ""} onchange="onColCheck('${pk.id}','${escapeAttr(f.key)}', this.checked)">
+          ${escapeHtml(f.label)}
+        </label>`).join("")}
+      </div>
+    </div>`;
+            }).join("");
+            const el = document.getElementById("colpanelCount_" + pk.id);
+            if (el) el.textContent = `${pk.visibleCols.size} / ${fieldDefsOf(pk).length} kolom aktif`;
+        }
+        function onColCheck(pkId, key, checked) {
+            const pk = getPacket(pkId);
+            if (checked) pk.visibleCols.add(key); else pk.visibleCols.delete(key);
+            savePacketVisibleCols(pk);
+            buildTableHead(pk); renderTable(pk); 
+            const el = document.getElementById("colpanelCount_" + pk.id);
+            if (el) el.textContent = `${pk.visibleCols.size} / ${fieldDefsOf(pk).length} kolom aktif`;
+        }
+        function toggleGroupColumns(pkId, group, show) {
+            const pk = getPacket(pkId);
+            fieldDefsOf(pk).filter(f => f.group === group).forEach(f => {
+                if (show) pk.visibleCols.add(f.key); else pk.visibleCols.delete(f.key);
+            });
+            savePacketVisibleCols(pk);
+            renderColumnPickerGroups(pk); buildTableHead(pk); renderTable(pk);
+        }
+        function toggleAllColumns(pkId, show) {
+            const pk = getPacket(pkId);
+            pk.visibleCols = show ? new Set(fieldDefsOf(pk).map(f => f.key)) : new Set();
+            savePacketVisibleCols(pk);
+            renderColumnPickerGroups(pk); buildTableHead(pk); renderTable(pk);
+        }
+
+        // CRUD Global
+        function openAdd() {
+            document.getElementById("dataForm").reset();
+            document.getElementById("f_id").value = "";
+            document.getElementById("modalTitle").textContent = "Tambah Data Baru";
+            document.getElementById("modal").classList.remove("hidden");
+        }
+        function openEdit(r) {
+            document.getElementById("modalTitle").textContent = "Edit Data";
+            document.getElementById("f_id").value = r.id || "";
+            FIELD_DEFS.forEach(f => {
+                const el = document.getElementById("f_" + cssKey(f.key));
+                if (!el) return;
+                el.value = r[f.key] ?? "";
+            });
+            document.getElementById("modal").classList.remove("hidden");
+        }
+        function closeModal() { document.getElementById("modal").classList.add("hidden") }
+
+        async function saveData(e) {
+            e.preventDefault();
+            const payload = { action: "save" };
+            payload.id = document.getElementById("f_id").value;
+            FIELD_DEFS.forEach(f => {
+                const el = document.getElementById("f_" + cssKey(f.key));
+                if (el) payload[f.key] = el.value;
+            });
+            try {
+                showAlert("Menyimpan data...", "info");
+                await apiPost(payload);
+                closeModal(); await loadData();
+            } catch (err) { showAlert("Gagal menyimpan: " + err.message, "error") }
+        }
+        async function deleteOne(id, rowKey) {
+            if (!confirm("Hapus data ini secara permanen?")) return;
+            try {
+                await apiPost({ action: "delete", id });
+                const key = rowKey || id;
+                packets.forEach(pk => { delete pk.rowStyles[key]; savePacketRowStyles(pk); });
+                await loadData();
+            } catch (err) { showAlert("Gagal menghapus: " + err.message, "error") }
+        }
+        async function deleteAllData() {
+            const c = prompt("Ketik HAPUS untuk menghapus SEMUA data di sistem secara permanen:");
+            if (c !== "HAPUS") return;
+            try {
+                await apiPost({ action: "deleteAll" });
+                packets.forEach(pk => { pk.rowStyles = {}; savePacketRowStyles(pk); });
+                await loadData();
+            } catch (err) { showAlert("Gagal menghapus data: " + err.message, "error") }
+        }
+        async function importExcel(event) {
+            const file = event.target.files[0]; event.target.value = "";
+            if (!file) return;
+            try {
+                showAlert("Memproses file Excel...", "info");
+                const data = await file.arrayBuffer();
+                const wb = XLSX.read(data, { type: "array", cellDates: false });
+                const ws = wb.Sheets[wb.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(ws, { defval: "" });
+                if (!rows.length) throw new Error("File kosong.");
+                const result = await apiPost({ action: "import", rows: JSON.stringify(rows) });
+                showAlert(result.msg || "Import berhasil.", "success");
+                await loadData();
+            } catch (err) { showAlert("Gagal import Excel: " + err.message, "error") }
+        }
+        function exportExcel() {
+            if (!filteredData.length) { showAlert("Tidak ada data untuk di-export.", "error"); return }
+            const rows = filteredData.map(r => {
+                const x = {}; FIELD_DEFS.forEach(f => x[f.label] = r[f.key] ?? ""); return x;
+            });
+            const ws = XLSX.utils.json_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Data");
+            XLSX.writeFile(wb, "Data_Export.xlsx");
+        }
+        function downloadTemplate() {
+            const sample = {};
+            FIELD_DEFS.forEach(f => { sample[f.label] = f.type === "number" ? 0 : ""; });
+            const ws = XLSX.utils.json_to_sheet([sample]);
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template");
+            XLSX.writeFile(wb, "Template_Import.xlsx");
+        }
+
+        function showAlert(msg, type) {
+            const el = document.getElementById("alert");
+            el.textContent = msg;
+            if(type === "error") {
+                el.style.color = "#dc2626"; // red
+                el.style.background = "#fee2e2";
+                el.style.padding = "10px";
+                el.style.borderRadius = "6px";
+            } else if (type === "success") {
+                el.style.color = "#059669"; // emerald
+                el.style.background = "#d1fae5";
+                el.style.padding = "10px";
+                el.style.borderRadius = "6px";
+            } else {
+                el.style.color = "#0369a1"; // sky
+                el.style.background = "#e0f2fe";
+                el.style.padding = "10px";
+                el.style.borderRadius = "6px";
+            }
+        }
+        function escapeHtml(v) { return String(v ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[m])) }
+        function escapeAttr(v) { return String(v ?? "").replace(/'/g, "\\'").replace(/"/g, '&quot;') }
+        function num(v, d = 0) { return Number(v || 0).toLocaleString("id-ID", { minimumFractionDigits: d, maximumFractionDigits: d }) }
+        function money(v) { return "Rp " + Number(v || 0).toLocaleString("id-ID", { maximumFractionDigits: 0 }) }
+        function formatCellValue(v, f, colSt) {
+            const fmt = (colSt && colSt.dataFormat) || (f.type === "number" ? "number" : "text");
+            switch (fmt) {
+                case "money": return money(v);
+                case "percent": return num(v, 2) + "%";
+                case "decimal2": return num(v, 2);
+                case "number": return num(v, 0);
+                case "text": default: return escapeHtml(v);
+            }
+        }
+    </script>
+</body>
+</html>

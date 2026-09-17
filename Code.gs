@@ -60,7 +60,7 @@ const SCHEMAS = {
     uniqueField: "",
     importAliases: {}
   },
-  users: {
+    users: {
     headers: ["id","username","password_hash","role","active","created_at","updated_at"],
     dateFields: [],
     numberFields: [],
@@ -120,7 +120,7 @@ function doGet(e){
 
 function doPost(e){
   try{
-    const p = e.parameter || {};
+    let p = e.parameter || {}; if(e.postData && e.postData.contents){ try{ const parsed = JSON.parse(e.postData.contents); if(parsed && typeof parsed === "object") p = parsed; }catch(ex){} }
     auth_(p.key);
     const action = p.action || "";
     const sheetName = p.sheet || CONFIG.DEFAULT_SHEET;
@@ -163,9 +163,10 @@ function sessionsSheet_(){
 function createSession_(username,role){
   const sh=sessionsSheet_();
   const token=Utilities.getUuid();
-  const now=new Date();
-  const expires=new Date(now.getTime()+CONFIG.SESSION_HOURS*3600*1000);
+  const now=Date.now();
+  const expires=now+CONFIG.SESSION_HOURS*3600*1000;
   sh.appendRow([token,username,role,now,expires]);
+  SpreadsheetApp.flush();
   return {token,expires};
 }
 
@@ -175,9 +176,10 @@ function validateSession_(token){
   const rows=sh.getDataRange().getValues();
   for(let i=1;i<rows.length;i++){
     if(String(rows[i][0])===String(token)){
-      const expires=new Date(rows[i][4]);
-      if(isNaN(expires.getTime())||expires.getTime()<Date.now()){
+      const expires=Number(rows[i][4]);
+      if(isNaN(expires)||expires<Date.now()){
         sh.deleteRow(i+1);
+        SpreadsheetApp.flush();
         throw new Error("Sesi kadaluarsa. Silakan login ulang.");
       }
       return {username:rows[i][1], role:rows[i][2]};
@@ -195,7 +197,8 @@ function destroySession_(token){
   const sh=sessionsSheet_();
   const rows=sh.getDataRange().getValues();
   for(let i=1;i<rows.length;i++){
-    if(String(rows[i][0])===String(token)){ sh.deleteRow(i+1); return; }
+    if(String(rows[i][0])===String(token)){ sh.deleteRow(i+1);
+        SpreadsheetApp.flush(); return; }
   }
 }
 
@@ -270,7 +273,7 @@ function buatAdminPertama(){
     Logger.log("Catatan: sudah ada admin lain di sheet 'users'. Tetap membuat admin baru: "+username);
   }
 
-  const now=new Date();
+  const now=Date.now();
   sh.appendRow([Utilities.getUuid(), username, hashPassword_(password), "admin", true, now, now]);
 
   const result="✅ Admin pertama berhasil dibuat.\nUsername: "+username+"\nSegera login lalu ganti password lewat halaman Kelola User.";
@@ -404,7 +407,7 @@ function list_(sheetName){
 function save_(sheetName,p){
   const schema=getSchema_(sheetName);
   const sh=sheet_(sheetName);
-  const now=new Date();
+  const now=Date.now();
   // PERBAIKAN: trim() id yang datang dari frontend dan dari sheet,
   // agar pencocokan baris untuk UPDATE tidak gagal karena spasi
   // tersembunyi atau perbedaan format string.
@@ -467,7 +470,8 @@ function delete_(sheetName,id){
   if(!id)throw new Error("ID tidak diberikan.");
   const sh=sheet_(sheetName), rows=sh.getDataRange().getValues();
   for(let i=1;i<rows.length;i++){
-    if(String(rows[i][0]).trim()===String(id).trim()){sh.deleteRow(i+1);return {ok:true,msg:"Data berhasil dihapus."};}
+    if(String(rows[i][0]).trim()===String(id).trim()){sh.deleteRow(i+1);
+        SpreadsheetApp.flush();return {ok:true,msg:"Data berhasil dihapus."};}
   }
   throw new Error("Data tidak ditemukan.");
 }
@@ -531,5 +535,16 @@ function normalize_(v){
 function json_(obj){
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
+
+
+
+
+
+
+
+
+
+
+
 
 

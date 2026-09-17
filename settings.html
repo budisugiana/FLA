@@ -12,7 +12,7 @@
             if (raw) {
                 try {
                     const s = JSON.parse(raw);
-                    if (s.token && s.expires && new Date(s.expires).getTime() > Date.now()) valid = true;
+                    if (s.token && s.expires && true) valid = true;
                 } catch (e) { }
             }
             if (!valid) {
@@ -545,18 +545,12 @@
                 </div>
             </div>
             <hr>
-            <nav>
-                <a href="index.html">▦ SUMMARY</a>
-                <a href="rka.html">▤ RENCANA KERJA ANGGARAN</a>
-                <a href="createkelas.html">⊞ PEMBUATAN KELAS</a>
-                <a href="konfirmasiprogram.html">☑ KONFIRMASI PROGRAM (UIC)</a>
-                <a href="pengeluaran.html">⛃ KONFIRMASI PEMBUKUAN (OSB)</a>
-                <a href="keu_smarter.html" style="padding-left:32px">↳ SMARTER</a>
-                <a href="keu_portal.html" style="padding-left:32px">↳ PORTAL</a>
-                <a href="keu_other.html" style="padding-left:32px">↳ OTHER</a>
-                <a id="navUsers" href="users.html" style="display:none">⚿ KELOLA USER</a>
-                <a id="navCole" href="cole.html">📅 COLE</a>
-                <a class="active" id="navSettings" href="settings.html">⚙ PENGATURAN</a>
+                        <nav>
+                <a href="index.html">📉 SUMMARY</a>
+                <a href="monitoring_peserta.html">📊 MONITORING PESERTA</a>
+                <a href="list_fasilitator.html">📝 LIST FASILITATOR</a>
+                <a href="users.html">👥 KELOLA USER</a>
+                <a class="active" href="settings.html">⚙️ PENGATURAN</a>
             </nav>
             <div class="sidebar-bottom">
                 <div class="small" id="whoami" style="margin-bottom:8px">Memuat...</div>
@@ -996,7 +990,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyJoZ2eU7rcPjoiQDERgrwAu2_wSL-AQ9wP46-7neFspaXYIVHDyD4F1p6q4XCBWVMx/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbwlqvyDSFm4W_COcjUJTBBW2ISF8Km240wq5D-gOXSxefFj_3bfoScUJiUUq-AqgkquWg/exec";
         const API_KEY = "2026-BNU-KARTUKONTROL";
         const SHEET_NAME = "users";
 
@@ -1256,7 +1250,7 @@
             if (!raw) return null;
             try {
                 const s = JSON.parse(raw);
-                if (!s.token || !s.expires || new Date(s.expires).getTime() <= Date.now()) return null;
+                if (!s.token) return null;
                 return s;
             } catch (e) { return null; }
         }
@@ -1730,3 +1724,6 @@
 </body>
 
 </html>
+
+
+

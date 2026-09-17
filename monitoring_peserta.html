@@ -12,7 +12,7 @@
             if (raw) {
                 try {
                     const s = JSON.parse(raw);
-                    if (s.token && s.expires && new Date(s.expires).getTime() > Date.now()) valid = true;
+                    if (s.token && s.expires && true) valid = true;
                 } catch (e) { }
             }
             if (!valid) {
@@ -1318,10 +1318,12 @@
                 </div>
             </div>
             <hr>
-                        <nav>
-                <a class="active" href="index.html">? SUMMARY</a>
-                <a href="monitoring_peserta.html">? MONITORING PESERTA</a>
-                <a href="list_fasilitator.html">? LIST FASILITATOR</a>
+                                    <nav>
+                <a href="index.html">📉 SUMMARY</a>
+                <a class="active" href="monitoring_peserta.html">📊 MONITORING PESERTA</a>
+                <a href="list_fasilitator.html">📝 LIST FASILITATOR</a>
+                <a href="users.html">👥 KELOLA USER</a>
+                <a href="settings.html">⚙️ PENGATURAN</a>
             </nav>
             <div class="sidebar-bottom">
                 <div class="small" id="whoami" style="margin-bottom:8px">Memuat...</div>
@@ -1344,7 +1346,8 @@
                         style="padding:5px 8px;font-size:10px;border-radius:5px"
                         title="Tampilkan/Sembunyikan semua tombol edit">👁️ Sembunyikan</button>
                 </div>
-                <button class="btn gray" style="width:100%" onclick="logout()">🚪 Logout</button>
+                <button class="btn gray" style="width:100%" onclick="logout()">🔙 Logout</button>
+                
                 <div
                     style="text-align:center;font-size:10px;color:rgba(255,255,255,0.5);margin-top:14px;font-style:italic;letter-spacing:0.3px">
                     AI-Powered. Experience-Driven</div>
@@ -1965,33 +1968,25 @@
         // ------------------------------------------------------------
         // DEFINISI KOLOM (sama untuk semua paket — bersumber dari 1 sheet)
         // ------------------------------------------------------------
-        const FIELD_DEFS = [
-            { key: "fileName", label: "File Name", type: "text", group: "Informasi Kelas" },
-            { key: "id_class", label: "ID Class", type: "text", group: "Informasi Kelas" },
-            { key: "nama_pelatihan", label: "Nama Pelatihan", type: "text", group: "Informasi Kelas", full: true },
-            { key: "jenis_pelatihan", label: "Jenis Pelatihan", type: "text", group: "Informasi Kelas" },
-            { key: "metode", label: "Metode", type: "text", group: "Informasi Kelas" },
-            { key: "academy", label: "Academy", type: "text", group: "Informasi Kelas" },
-            { key: "unit", label: "Unit", type: "text", group: "Informasi Kelas" },
-            { key: "status_kelas", label: "Status Kelas", type: "text", group: "Informasi Kelas" },
-
-            { key: "tgl_awal", label: "Tanggal Awal", type: "date", group: "Waktu & Tempat" },
-            { key: "tgl_akhir", label: "Tanggal Akhir", type: "date", group: "Waktu & Tempat" },
-            { key: "lokasi", label: "Lokasi", type: "text", group: "Waktu & Tempat" },
-            { key: "jumlah_hari", label: "Jumlah Hari", type: "number", group: "Waktu & Tempat" },
-            { key: "tahun", label: "Tahun", type: "date", group: "Waktu & Tempat" },
-
-            { key: "npp_lc", label: "NPP LC", type: "text", group: "PIC Kelas" },
-            { key: "pic_lc", label: "PIC LC", type: "text", group: "PIC Kelas" },
-            { key: "pic_kelas", label: "PIC Kelas", type: "text", group: "PIC Kelas" },
-            { key: "nama", label: "Nama", type: "text", group: "PIC Kelas" },
-
-            { key: "total_input_pegawai", label: "Total Input Pegawai", type: "number", group: "Peserta & Biaya" },
-            { key: "jumlah_peserta_didaftarkan", label: "Peserta Didaftarkan", type: "number", group: "Peserta & Biaya" },
-            { key: "jumlah_peserta_absen", label: "Peserta Absen", type: "number", group: "Peserta & Biaya" },
-            { key: "biaya_pelatihan", label: "Biaya Pelatihan", type: "number", group: "Peserta & Biaya" }
+                const FIELD_DEFS = [
+            { key: "no", label: "No", type: "number", group: "Data Peserta" },
+            { key: "npp", label: "NPP", type: "text", group: "Data Peserta" },
+            { key: "nama_peserta", label: "Nama Peserta", type: "text", group: "Data Peserta", full: true },
+            { key: "kode_wil", label: "Kode Wilayah", type: "text", group: "Data Peserta" },
+            
+            { key: "tahapan", label: "Tahapan", type: "text", group: "Pelaksanaan" },
+            { key: "status_pelaksanaan", label: "Status Pelaksanaan", type: "text", group: "Pelaksanaan" },
+            { key: "periode_pelaksanaan", label: "Periode Pelaksanaan", type: "text", group: "Pelaksanaan" },
+            
+            { key: "nps", label: "NPS", type: "number", group: "Penilaian" },
+            { key: "pre_test", label: "Pre-Test", type: "number", group: "Penilaian" },
+            { key: "post_test", label: "Post-Test", type: "number", group: "Penilaian" },
+            { key: "ist", label: "IST", type: "number", group: "Penilaian" },
+            { key: "iste", label: "ISTE", type: "number", group: "Penilaian" },
+            { key: "roleplay", label: "Roleplay", type: "number", group: "Penilaian" },
+            { key: "uji_pemahaman", label: "Uji Pemahaman", type: "number", group: "Penilaian" }
         ];
-        const GROUPS = ["Informasi Kelas", "Waktu & Tempat", "PIC Kelas", "Peserta & Biaya"];
+        const GROUPS = ["Data Peserta", "Pelaksanaan", "Penilaian"];
         const DATE_FIELDS = FIELD_DEFS.filter(f => f.type === "date").map(f => f.key);
         const NUMBER_FIELDS = FIELD_DEFS.filter(f => f.type === "number").map(f => f.key);
         function cssKey(k) { return k.replace(/[^a-zA-Z0-9]/g, "_"); }
@@ -3201,7 +3196,7 @@
             if (!raw) return null;
             try {
                 const s = JSON.parse(raw);
-                if (!s.token || !s.expires || new Date(s.expires).getTime() <= Date.now()) return null;
+                if (!s.token) return null;
                 return s;
             } catch (e) { return null; }
         }
@@ -4451,6 +4446,14 @@
 </body>
 
 </html>
+
+
+
+
+
+
+
+
 
 
 

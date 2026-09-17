@@ -1311,18 +1311,18 @@
     <div class="app-shell">
         <aside class="sidebar">
             <div class="brand">
-                <div class="brand-mark">LSV</div>
+                <div class="brand-mark">FLA</div>
                 <div>
-                    <div class="brand-title">Kartu Kontrol</div>
-                    <div class="brand-subtitle">Budget Monitoring</div>
+                    <div class="brand-title">Frontliner Academy</div>
+                    <div class="brand-subtitle">Journey Monitoring</div>
                 </div>
             </div>
             <hr>
                                     <nav>
-                <a href="index.html">📉 SUMMARY</a>
-                <a href="monitoring_peserta.html">📊 MONITORING PESERTA</a>
-                <a class="active" href="list_fasilitator.html">📝 LIST FASILITATOR</a>
-                <a href="users.html">👥 KELOLA USER</a>
+                <a href="index.html">SUMMARY</a>
+                <a href="monitoring_peserta.html">MONITORING PESERTA</a>
+                <a class="active" href="list_fasilitator.html">LIST FASILITATOR</a>
+                <a href="users.html">KELOLA USER</a>
                 <a href="settings.html">⚙️ PENGATURAN</a>
             </nav>
             <div class="sidebar-bottom">
@@ -1385,7 +1385,7 @@
                     <select id="filterLokasi">
                         <option value="">Semua Lokasi</option>
                     </select>
-                    <input id="searchInput" placeholder="ID class / pelatihan / PIC / academy...">
+                    <input id="searchInput" placeholder="Cari apa saja...">
                     <button class="btn primary" onclick="applyFilters()">🔎 Terapkan</button>
                     <button class="btn gray" onclick="resetFilters()">↺ Reset</button>
                 </div>
@@ -3773,10 +3773,10 @@
         // edit (card-actions, packet-actions, reorder-btns, .icon-btn)
         // di seluruh halaman dengan satu klik.
         // ============================================================
-        let _editPanelsVisible = true;
+        let _editPaneFLAisible = true;
         function toggleAllEditPanels(force) {
-            if (typeof force === "boolean") _editPanelsVisible = force;
-            else _editPanelsVisible = !_editPanelsVisible;
+            if (typeof force === "boolean") _editPaneFLAisible = force;
+            else _editPaneFLAisible = !_editPaneFLAisible;
 
             const btn = document.getElementById("globalEditToggleBtn");
             // Selector untuk semua area edit: kartu scorecard, grafik, paket tabel, tombol icon-btn
@@ -3794,12 +3794,12 @@
             ];
             editSelectors.forEach(sel => {
                 document.querySelectorAll(sel).forEach(el => {
-                    el.style.display = _editPanelsVisible ? "" : "none";
+                    el.style.display = _editPaneFLAisible ? "" : "none";
                 });
             });
             if (btn) {
-                btn.textContent = _editPanelsVisible ? "👁️ Sembunyikan Menu Edit" : "✏️ Tampilkan Menu Edit";
-                btn.classList.toggle("active", _editPanelsVisible);
+                btn.textContent = _editPaneFLAisible ? "👁️ Sembunyikan Menu Edit" : "✏️ Tampilkan Menu Edit";
+                btn.classList.toggle("active", _editPaneFLAisible);
             }
         }
 
@@ -4449,6 +4449,11 @@
 </body>
 
 </html>
+
+
+
+
+
 
 
 
